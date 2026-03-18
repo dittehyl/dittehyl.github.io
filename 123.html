@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>完治咖啡 WanZhi Coffee | Brew Moments of Calm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'forest': '#1F4D3A',
+                        'cream': '#F6F3EE',
+                        'coffee': '#6B4F3A',
+                        'gold': '#C8A96A',
+                    },
+                    fontFamily: {
+                        'display': ['"Playfair Display"', 'serif'],
+                        'body': ['"Inter"', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        '2xl': '1rem',
+                        '3xl': '1.5rem',
+                        '4xl': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --forest: #1F4D3A;
+            --cream: #F6F3EE;
+            --coffee: #6B4F3A;
+            --gold: #C8A96A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--cream);
+            color: #222;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.025;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .hero-bg {
+            background-image: linear-gradient(to bottom, rgba(31, 77, 58, 0.7), rgba(31, 77, 58, 0.9)),
+                url('https://images.unsplash.com/photo-1497935586351-b67a49e012bf?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .glass-card {
+            background: rgba(246, 243, 238, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(31, 77, 58, 0.1);
+        }
+
+        .magnetic-btn {
+            transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .char {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(40px) rotateX(90deg);
+        }
+
+        .image-zoom {
+            transition: transform 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .image-zoom:hover {
+            transform: scale(1.08);
+        }
+
+        .menu-card {
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.5s ease;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(31, 77, 58, 0.2);
+        }
+
+        .menu-card::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold), var(--coffee));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            z-index: 10;
+        }
+
+        .menu-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .menu-image-wrapper {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-image-wrapper::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(31, 77, 58, 0.4) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .menu-card:hover .menu-image-wrapper::after {
+            opacity: 1;
+        }
+
+        .testimonial-card {
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(31, 77, 58, 0.15);
+        }
+
+        .nav-link {
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gold);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .price-tag {
+            position: relative;
+            display: inline-block;
+        }
+
+        .price-tag::before {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: -4px;
+            right: -4px;
+            height: 8px;
+            background: var(--gold);
+            opacity: 0.25;
+            border-radius: 2px;
+            z-index: -1;
+        }
+
+        @media (max-width: 768px) {
+            .hero-bg {
+                background-attachment: scroll;
+            }
+        }
+    </style>
+</head>
+<body class="font-body text-gray-800">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 py-4 px-6 md:px-12 transition-all duration-500">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-forest flex items-center justify-center">
+                    <span class="text-cream font-display font-bold text-lg">完</span>
+                </div>
+                <div class="font-display font-semibold text-forest text-xl tracking-wide">
+                    WanZhi Coffee
+                </div>
+            </div>
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#story" class="nav-link text-sm font-medium text-forest/80 hover:text-forest transition-colors">品牌故事</a>
+                <a href="#signature" class="nav-link text-sm font-medium text-forest/80 hover:text-forest transition-colors">特色咖啡</a>
+                <a href="#experience" class="nav-link text-sm font-medium text-forest/80 hover:text-forest transition-colors">咖啡体验</a>
+                <a href="#menu" class="nav-link text-sm font-medium text-forest/80 hover:text-forest transition-colors">菜单</a>
+                <a href="#testimonials" class="nav-link text-sm font-medium text-forest/80 hover:text-forest transition-colors">顾客评价</a>
+            </div>
+            <button class="magnetic-btn bg-forest text-cream px-6 py-2.5 rounded-full text-sm font-medium hover:bg-forest/90 transition-colors">
+                预约座位
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-bg min-h-screen flex items-center justify-center relative">
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-cream/10"></div>
+        <div class="text-center z-10 px-4 max-w-4xl mx-auto">
+            <div class="mb-6 overflow-hidden">
+                <h1 id="hero-title" class="font-display text-5xl md:text-7xl lg:text-8xl text-cream font-semibold leading-tight">
+                    完治咖啡
+                </h1>
+            </div>
+            <div class="mb-8 overflow-hidden">
+                <h2 id="hero-subtitle" class="font-display text-2xl md:text-3xl lg:text-4xl text-cream/90 font-light tracking-wider">
+                    WanZhi Coffee
+                </h2>
+            </div>
+            <div class="mb-12 overflow-hidden">
+                <p id="hero-tagline" class="text-cream/80 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+                    Brew Moments of Calm
+                </p>
+            </div>
+            <div class="overflow-hidden">
+                <button id="hero-cta" class="magnetic-btn bg-cream text-forest px-8 py-4 rounded-full font-medium text-lg hover:bg-cream/90 transition-all duration-300 hover:shadow-lg hover:shadow-cream/20">
+                    <span class="flex items-center gap-3">
+                        <span>探索我们的咖啡</span>
+                        <iconify-icon icon="lucide:arrow-right" width="20"></iconify-icon>
+                    </span>
+                </button>
+            </div>
+        </div>
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+            <div class="w-6 h-10 border-2 border-cream/50 rounded-full flex justify-center">
+                <div class="w-1 h-3 bg-cream/80 rounded-full mt-2 animate-bounce"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Brand Story -->
+    <section id="story" class="py-24 md:py-32 bg-cream relative">
+        <div class="max-w-7xl mx-auto px-6 md:px-12">
+            <div class="text-center mb-16 md:mb-24">
+                <h2 class="font-display text-4xl md:text-5xl lg:text-6xl text-forest font-semibold mb-6">
+                    我们的咖啡哲学
+                </h2>
+                <p class="text-coffee/80 text-lg max-w-3xl mx-auto leading-relaxed">
+                    在完治咖啡，我们相信每一杯咖啡都承载着一段故事，每一次品尝都是一次心灵的治愈之旅。
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 md:gap-12">
+                <!-- Slow Coffee -->
+                <div class="story-card glass-card rounded-3xl p-8 md:p-10 text-center">
+                    <div class="w-16 h-16 bg-forest/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <iconify-icon icon="lucide:clock" width="32" class="text-forest"></iconify-icon>
+                    </div>
+                    <h3 class="font-display text-2xl text-forest font-semibold mb-4">慢咖啡文化</h3>
+                    <p class="text-coffee/80 leading-relaxed">
+                        我们拒绝匆忙，坚持每一杯咖啡都经过精心的萃取与等待，让您品味时间的艺术。
+                    </p>
+                </div>
+
+                <!-- Urban Retreat -->
+                <div class="story-card glass-card rounded-3xl p-8 md:p-10 text-center">
+                    <div class="w-16 h-16 bg-forest/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <iconify-icon icon="lucide:leaf" width="32" class="text-forest"></iconify-icon>
+                    </div>
+                    <h3 class="font-display text-2xl text-forest font-semibold mb-4">城市绿洲</h3>
+                    <p class="text-coffee/80 leading-relaxed">
+                        在喧嚣都市中为您打造一片宁静的庇护所，让心灵得到片刻的喘息与治愈。
+                    </p>
+                </div>
+
+                <!-- Crafted Experience -->
+                <div class="story-card glass-card rounded-3xl p-8 md:p-10 text-center">
+                    <div class="w-16 h-16 bg-forest/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <iconify-icon icon="lucide:award" width="32" class="text-forest"></iconify-icon>
+                    </div>
+                    <h3 class="font-display text-2xl text-forest font-semibold mb-4">匠心体验</h3>
+                    <p class="text-coffee/80 leading-relaxed">
+                        从咖啡豆的精选到最终呈现，每一个环节都凝聚着我们对品质的执着追求。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Signature Coffee -->
+    <section id="signature" class="py-24 md:py-32 bg-forest/5 relative">
+        <div class="max-w-7xl mx-auto px-6 md:px-12">
+            <div class="text-center mb-16 md:mb-24">
+                <h2 class="font-display text-4xl md:text-5xl lg:text-6xl text-forest font-semibold mb-6">
+                    招牌咖啡系列
+                </h2>
+                <p class="text-coffee/80 text-lg max-w-3xl mx-auto leading-relaxed">
+                    每一杯都是我们咖啡师精心打造的艺术品，承载着对咖啡文化的深刻理解与创新表达。
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- WanZhi Latte -->
+                <div class="signature-coffee group">
+                    <div class="relative overflow-hidden rounded-3xl mb-6 aspect-[4/5]">
+                        <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1935&q=80" 
+                             alt="完治拿铁" 
+                             class="w-full h-full object-cover image-zoom">
+                        <div class="absolute inset-0 bg-gradient-to-t from-forest/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div class="absolute bottom-6 left-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-y-4 group-hover:translate-y-0">
+                            <span class="inline-block bg-gold text-forest px-4 py-2 rounded-full text-sm font-medium">招牌推荐</span>
+                        </div>
+                    </div>
+                    <h3 class="font-display text-2xl text-forest font-semibold mb-2">完治拿铁</h3>
+                    <p class="text-coffee/80 mb-4">WanZhi Latte</p>
+                    <p class="text-coffee/60 text-sm leading-relaxed">
+                        丝滑的燕麦奶与浓缩咖啡完美融合，顶部撒上可可粉，带来温暖治愈的口感体验。
+                    </p>
+                </div>
+
+                <!-- Caramel Hazelnut Latte -->
+                <div class="signature-coffee group">
+                    <div class="relative overflow-hidden rounded-3xl mb-6 aspect-[4/5]">
+                        <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?ixlib=rb-4.0.3&auto=format&fit=crop&w=1964&q=80" 
+                             alt="焦糖榛果拿铁" 
+                             class="w-full h-full object-cover image-zoom">
+                        <div class="absolute inset-0 bg-gradient-to-t from-forest/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div class="absolute bottom-6 left-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-y-4 group-hover:translate-y-0">
+                            <span class="inline-block bg-gold text-forest px-4 py-2 rounded-full text-sm font-medium">人气之选</span>
+                        </div>
+                    </div>
+                    <h3 class="font-display text-2xl text-forest font-semibold mb-2">焦糖榛果拿铁</h3>
+                    <p class="text-coffee/80 mb-4">Caramel Hazelnut Latte</p>
+                    <p class="text-coffee/60 text-sm leading-relaxed">
+                        焦糖的甜蜜与榛果的醇香交织，与咖啡的苦韵形成完美平衡，层次丰富迷人。
+                    </p>
+                </div>
+
+                <!-- Matcha Cloud Latte -->
+                <div class="signature-coffee group">
+                    <div class="relative overflow-hidden rounded-3xl mb-6 aspect-[4/5]">
+                        <img src="https://images.unsplash.com/photo-1563805042-7684c019e1cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1974&q=80" 
+                             alt="抹茶云朵拿铁" 
+                             class="w-full h-full object-cover image-zoom">
+                        <div class="absolute inset-0 bg-gradient-to-t from-forest/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div class="absolute bottom-6 left-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-y-4 group-hover:translate-y-0">
+                            <span class="inline-block bg-gold text-forest px-4 py-2 rounded-full text-sm font-medium">创意特调</span>
+                        </div>
+                    </div>
+                    <h3 class="font-display text-2xl text-forest font-semibold mb-2">抹茶云朵拿铁</h3>
+                    <p class="text-coffee/80 mb-4">Matcha Cloud Latte</p>
+                    <p class="text-coffee/60 text-sm leading-relaxed">
+                        宇治抹茶与绵密奶泡的相遇，如云朵般轻盈，带来清新的日式咖啡体验。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Coffee Experience -->
+    <section id="experience" class="py-24 md:py-32 relative overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?ixlib=rb-4.0.3&auto=format&fit=crop&w=2047&q=80" 
+                 alt="咖啡店空间" 
+                 class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-forest/80"></div>
+        </div>
+        
+        <div class="relative z-10 max-w-7xl mx-auto px-6 md:px-12">
+            <div class="grid md:grid-cols-2 gap-12 md:gap-24 items-center">
+                <div>
+                    <h2 class="font-display text-4xl md:text-5xl lg:text-6xl text-cream font-semibold mb-8">
+                        都市疗愈<br>咖啡空间
+                    </h2>
+                    <p class="text-cream/80 text-lg leading-relaxed mb-8">
+                        我们精心打造的空间不仅是品尝咖啡的场所，更是都市人的心灵栖息地。温暖的木质元素、柔和的灯光与舒适的座椅，共同营造出家一般的温馨氛围。
+                    </p>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="glass-card rounded-2xl p-6 bg-cream/10 border-cream/20">
+                            <iconify-icon icon="lucide:sofa" width="32" class="text-gold mb-4"></iconify-icon>
+                            <h4 class="font-display text-lg text-cream font-semibold mb-2">舒适座位</h4>
+                            <p class="text-cream/70 text-sm">人体工学设计，久坐不累</p>
+                        </div>
+                        <div class="glass-card rounded-2xl p-6 bg-cream/10 border-cream/20">
+                            <iconify-icon icon="lucide:tree-pine" width="32" class="text-gold mb-4"></iconify-icon>
+                            <h4 class="font-display text-lg text-cream font-semibold mb-2">自然材质</h4>
+                            <p class="text-cream/70 text-sm">天然木材与绿植点缀</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="aspect-[4/5] rounded-3xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1493857671505-72967e2e2760?ixlib=rb-4.0.3&auto=format&fit=crop&w=1974&q=80" 
+                             alt="咖啡师工作" 
+                             class="w-full h-full object-cover image-zoom">
+                    </div>
+                    <div class="absolute -bottom-8 -left-8 w-32 h-32 bg-gold/20 rounded-full blur-3xl"></div>
+                    <div class="absolute -top-8 -right-8 w-48 h-48 bg-forest/30 rounded-full blur-3xl"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Coffee Menu Highlights -->
+    <section id="menu" class="py-24 md:py-32 bg-cream relative">
+        <div class="max-w-7xl mx-auto px-6 md:px-12">
+            <div class="text-center mb-16 md:mb-24">
+                <h2 class="font-display text-4xl md:text-5xl lg:text-6xl text-forest font-semibold mb-6">
+                    精选菜单
+                </h2>
+                <p class="text-coffee/80 text-lg max-w-3xl mx-auto leading-relaxed">
+                    从经典意式咖啡到创意特调，搭配手工烘焙点心，满足您对品质生活的所有想象。
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Espresso -->
+                <div class="menu-card glass-card rounded-3xl overflow-hidden">
+                    <div class="menu-image-wrapper aspect-[4/3]">
+                        <img src="https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1935&q=80" 
+                             alt="意式浓缩" 
+                             class="w-full h-full object-cover image-zoom">
+                    </div>
+                    <div class="p-6 md:p-8">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-forest/10 rounded-xl flex items-center justify-center">
+                                    <iconify-icon icon="lucide:coffee" width="20" class="text-forest"></iconify-icon>
+                                </div>
+                                <div>
+                                    <h4 class="font-display text-xl text-forest font-semibold">意式浓缩</h4>
+                                    <p class="text-coffee/60 text-xs tracking-wider uppercase">Espresso</p>
+                                </div>
+                            </div>
+                            <span class="price-tag text-gold font-display text-xl font-semibold">¥28</span>
+                        </div>
+                        <p class="text-coffee/70 text-sm leading-relaxed mt-4">
+                            深度烘焙的阿拉比卡豆，萃取出浓郁醇厚的精华，唤醒您每一个感官细胞。
+                        </p>
+                        <div class="flex items-center gap-4 mt-5 pt-5 border-t border-forest/10">
+                            <span class="text-xs text-coffee/50 flex items-center gap-1">
+                                <iconify-icon icon="lucide:flame" width="14"></iconify-icon>
+                                浓郁
+                            </span>
+                            <span class="text-xs text-coffee/50 flex items-center gap-1">
+                                <iconify-icon icon="lucide:droplets" width="14"></iconify-icon>
+                                30ml
+                            </span>
+                            <span class="text-xs text-coffee/50 flex items-center gap-1">
+                                <iconify-icon icon="lucide:zap" width="14"></iconify-icon>
+                                高咖啡因
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Latte -->
+                <div class="menu-card glass-card rounded-3xl overflow-hidden">
+                    <div class="menu-image-wrapper aspect-[4/3]">
+                        <img src="https://images.unsplash.com/photo-1561882468-9110e03e0f78?ixlib=rb-4.0.3&auto=format&fit=crop&w=1974&q=80" 
+                             alt="经典拿铁" 
+                             class="w-full h-full object-cover image-zoom">
+                    </div>
+                    <div class="p-6 md:p-8">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-forest/10 rounded-xl flex items-center justify-center">
+                                    <iconify-icon icon="lucide:milk" width="20" class="text-forest"></iconify-icon>
+                                </div>
+                                <div>
+                                    <h4 class="font-display text-xl text-forest font-semibold">经典拿铁</h4>
+                                    <p class="text-coffee/60 text-xs tracking-wider uppercase">Caffè Latte</p>
+                                </div>
+                            </div>
+                            <span class="price-tag text-gold font-display text-xl font-semibold">¥36</span>
+                        </div>
+                        <p class="text-coffee/70 text-sm leading-relaxed mt-4">
+                            丝滑的蒸煮牛奶与浓缩咖啡的完美邂逅，如天鹅绒般柔滑，温暖治愈。
+                        </p>
+                        <div class="flex items-center gap-4 mt-5 pt-5 border-t border-forest/10">
+                            <span class="text-xs text-coffee/50 flex items-center gap-1">
+                                <iconify-icon icon="lucide:heart" width="14"></iconify-icon>
+                                丝滑
+                            </span>
+                            <span class="text-xs text-coffee/50 flex items-center gap-1">
+                                <iconify-icon icon="lucide:droplets" width="14"></iconify-icon>
+                                350ml
+                            </span>
+                            <span class="text-xs text-coffee/50 flex items-center gap-1">
+                                <iconify-icon icon="lucide:thermometer" width="14"></iconify-icon>
+                                可选冰/热
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cappuccino -->
+                <div class="menu-card glass-card rounded-3xl overflow-hidden">
+                    <div class="menu-image-wrapper aspect-[4/3]">
+                        <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1935&q=80" 
+                             alt="卡布奇诺" 
+                             class="w-full h-full object-cover image-zoom">
+                    </div>
+                    <div class="p-6 md:p-8">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-forest/10 rounded-xl flex items-center justify-center">
+                                    <iconify-icon icon="lucide:cup-soda" width="20" class="text-forest"></iconify-icon>
+                                </div>
+                                <div>
+                                    <h4 class="font-display text-xl text-forest font-semibold">卡布奇诺</h4>
+                                    <p class="text-coffee/60 text-xs tracking-wider uppercase">Cappuccino</p>
+                                </div>
+                            </div>
+                            <span class="price-tag text-gold font-display text-xl font-semibold">¥38</span>
+                        </div>
+                        <p class="text-coffee/70 text-sm leading-relaxed mt-4">
+                            绵密的奶泡与浓缩咖啡的经典比例艺术，每一口都是意大利的浪漫风情。
+                        </p>
+                        <div class="flex items-center gap-4 mt-5 pt-5 border-t border-forest/10">
+                            <span class="text-xs text-coffee/50 flex items-center gap-1">
+                                <iconify-icon icon="lucide:cloud" width="14"></iconify-icon>
+                                绵密
+                            </span>
+                            <span class="text-xs text-coffee/50 flex items-center gap-1">
+                                <iconify-icon icon="lucide:droplets" width="14"></iconify-icon>
+                                240ml
+                            </span>
+                            <span class="text-xs text-coffee/50 flex items-center gap-1">
+                                <iconify-icon icon="lucide:sparkles" width="14"></iconify-icon>
+                                可撒肉桂粉
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Croissant -->
+                <div class="menu-card glass-card rounded-3xl overflow-hidden">
+                    <div class="menu-image-wrapper aspect-[4/3]">
+                        <img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1926&q=80" 
+                             alt="法式可颂" 
+                             class="w-full h-full object-cover image-zoom">
+                    </div>
+                    <div class="p-6 md:p-8">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-forest/10 rounded-xl flex items-center justify-center">
+                                    <iconify-icon icon="lucide:croissant" width="20" class="text-forest"></iconify-icon>
+                                </div>
+                                <div>
+                                    <h4 class="font-display text-xl text-forest font-semibold">法式可颂</h4>
+                                    <p class="text-coffee/60 text-xs tracking-wider uppercase">Croissant</p>
+                                </div>
+                            </div>
+                            <span class="price-tag text-gold font-display text-xl font-semibold">¥24</span>
+                        </div>
+                        <p class="text-coffee/70 text-sm leading-relaxed mt-4">
+                            每日新鲜手工开酥，27层酥皮层层分明，外脆内软，黄油香气四溢。
+                        </p>
+                        <div class="flex items-center gap-4 mt-5 pt-5 border-t border-forest/10">
+                            <span class="text-xs text-coffee/50 flex items-center gap-1">
+                                <iconify-icon icon="lucide:sun" width="14"></iconify-icon>
+                                每日新鲜
+                            </span>
+                            <span class="text-xs text-coffee/50 flex items-center gap-1">
+                                <iconify-icon icon="lucide:wheat" width="14"></iconify-icon>
+                                法国黄油
+                            </span>
+                            <span class="text-xs text-coffee/50 flex items-center gap-1">
+                                <iconify-icon icon="lucide:timer" width="14"></iconify-icon>
+                                限量供应
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sandwich -->
+                <div class="menu-card glass-card rounded-3xl overflow-hidden">
+                    <div class="menu-image-wrapper aspect-[4/3]">
+                        <img src="https://images.unsplash.com/photo-1528735602780-2552fd46c7af?ixlib=rb-4.0.3&auto=format&fit=crop&w=2073&q=80" 
+                             alt="三明治" 
+                             class="w-full h-full object-cover image-zoom">
+                    </div>
+                    <div class="p-6 md:p-8">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-forest/10 rounded-xl flex items-center justify-center">
+                                    <iconify-icon icon="lucide:sandwich" width="20" class="text-forest"></iconify-icon>
+                                </div>
+                                <div>
+                                    <h4 class="font-display text-xl text-forest font-semibold">三明治</h4>
+                                    <p class="text-coffee/60 text-xs tracking-wider uppercase">Club Sandwich</p>
+                                </div>
+                            </div>
+                            <span class="price-tag text-gold font-display text-xl font-semibold">¥42</span>
+                        </div>
+                        <p class="text-coffee/70 text-sm leading-relaxed mt-4">
+                            新鲜蔬菜搭配烟熏火腿与芝士，全麦面包烘烤至金黄，健康美味的轻食之选。
+                        </p>
+                        <div class="flex items-center gap-4 mt-5 pt-5 border-t border-forest/10">
+                            <span class="text-xs text-coffee/50 flex items-center gap-1">
+                                <iconify-icon icon="lucide:leaf" width="14"></iconify-icon>
+                                新鲜蔬菜
+                            </span>
+                            <span class="text-xs text-coffee/50 flex items-center gap-1">
+                                <iconify-icon icon="lucide:salad" width="14"></iconify-icon>
+                                健康轻食
+                            </span>
+                            <span class="text-xs text-coffee/50 flex items-center gap-1">
+                                <iconify-icon icon="lucide:wheat-off" width="14"></iconify-icon>
+                                可换无麸质
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cheesecake -->
+                <div class="menu-card glass-card rounded-3xl overflow-hidden">
+                    <div class="menu-image-wrapper aspect-[4/3]">
+                        <img src="https://images.unsplash.com/photo-1565958011703-44f9829ba187?ixlib=rb-4.0.3&auto=format&fit=crop&w=1965&q=80" 
+                             alt="芝士蛋糕" 
+                             class="w-full h-full object-cover image-zoom">
+                    </div>
+                    <div class="p-6 md:p-8">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-forest/10 rounded-xl flex items-center justify-center">
+                                    <iconify-icon icon="lucide:cake" width="20" class="text-forest"></iconify-icon>
+                                </div>
+                                <div>
+                                    <h4 class="font-display text-xl text-forest font-semibold">芝士蛋糕</h4>
+                                    <p class="text-coffee/60 text-xs tracking-wider uppercase">New York Cheesecake</p>
+                                </div>
+                            </div>
+                            <span class="price-tag text-gold font-display text-xl font-semibold">¥38</span>
+                        </div>
+                        <p class="text-coffee/70 text-sm leading-relaxed mt-4">
+                            纽约经典风味，细腻顺滑的芝士层配上酥脆饼干底，甜蜜收尾的最佳选择。
+                        </p>
+                        <div class="flex items-center gap-4 mt-5 pt-5 border-t border-forest/10">
+                            <span class="text-xs text-coffee/50 flex items-center gap-1">
+                                <iconify-icon icon="lucide:heart" width="14"></iconify-icon>
+                                人气甜点
+                            </span>
+                            <span class="text-xs text-coffee/50 flex items-center gap-1">
+                                <iconify-icon icon="lucide:cherry" width="14"></iconify-icon>
+                                配蓝莓酱
+                            </span>
+                            <span class="text-xs text-coffee/50 flex items-center gap-1">
+                                <iconify-icon icon="lucide:award" width="14"></iconify-icon>
+                                主厨推荐
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Menu CTA -->
+            <div class="text-center mt-16">
+                <button class="magnetic-btn border-2 border-forest text-forest px-8 py-4 rounded-full font-medium text-lg hover:bg-forest hover:text-cream transition-all duration-300">
+                    <span class="flex items-center gap-3">
+                        <span>查看完整菜单</span>
+                        <iconify-icon icon="lucide:arrow-right" width="20"></iconify-icon>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section id="testimonials" class="py-24 md:py-32 bg-forest/5 relative">
+        <div class="max-w-7xl mx-auto px-6 md:px-12">
+            <div class="text-center mb-16 md:mb-24">
+                <h2 class="font-display text-4xl md:text-5xl lg:text-6xl text-forest font-semibold mb-6">
+                    顾客心声
+                </h2>
+                <p class="text-coffee/80 text-lg max-w-3xl mx-auto leading-relaxed">
+                    来自我们尊贵顾客的真实评价，每一次认可都是我们前进的动力。
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="testimonial-card glass-card rounded-3xl p-8 md:p-10">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 rounded-full overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=774&q=80" 
+                                 alt="顾客照片" 
+                                 class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h5 class="font-display text-lg text-forest font-semibold">陈先生</h5>
+                            <p class="text-coffee/60 text-sm">自由摄影师</p>
+                        </div>
+                    </div>
+                    <p class="text-coffee/80 leading-relaxed mb-6">
+                        "完治咖啡已经成为我灵感的源泉。每次在这里工作，都能感受到一种特别的宁静，咖啡品质更是无可挑剔。"
+                    </p>
+                    <div class="flex gap-1">
+                        <iconify-icon icon="lucide:star" width="20" class="text-gold"></iconify-icon>
+                        <iconify-icon icon="lucide:star" width="20" class="text-gold"></iconify-icon>
+                        <iconify-icon icon="lucide:star" width="20" class="text-gold"></iconify-icon>
+                        <iconify-icon icon="lucide:star" width="20" class="text-gold"></iconify-icon>
+                        <iconify-icon icon="lucide:star" width="20" class="text-gold"></iconify-icon>
+                    </div>
+                </div>
+
+                <!-- Testimonial 2 -->
+                <div class="testimonial-card glass-card rounded-3xl p-8 md:p-10">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 rounded-full overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80" 
+                                 alt="顾客照片" 
+                                 class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h5 class="font-display text-lg text-forest font-semibold">李女士</h5>
+                            <p class="text-coffee/60 text-sm">品牌策划</p>
+                        </div>
+                    </div>
+                    <p class="text-coffee/80 leading-relaxed mb-6">
+                        "这里的焦糖榛果拿铁是我喝过最好的！空间设计也非常用心，每次带客户来都得到好评。"
+                    </p>
+                    <div class="flex gap-1">
+                        <iconify-icon icon="lucide:star" width="20" class="text-gold"></iconify-icon>
+                        <iconify-icon icon="lucide:star" width="20" class="text-gold"></iconify-icon>
+                        <iconify-icon icon="lucide:star" width="20" class="text-gold"></iconify-icon>
+                        <iconify-icon icon="lucide:star" width="20" class="text-gold"></iconify-icon>
+                        <iconify-icon icon="lucide:star" width="20" class="text-gold"></iconify-icon>
+                    </div>
+                </div>
+
+                <!-- Testimonial 3 -->
+                <div class="testimonial-card glass-card rounded-3xl p-8 md:p-10">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 rounded-full overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80" 
+                                 alt="顾客照片" 
+                                 class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h5 class="font-display text-lg text-forest font-semibold">王先生</h5>
+                            <p class="text-coffee/60 text-sm">软件工程师</p>
+                        </div>
+                    </div>
+                    <p class="text-coffee/80 leading-relaxed mb-6">
+                        "周末最期待的就是来这里，点一杯完治拿铁，读一本好书。这就是我理想中的城市生活。"
+                    </p>
+                    <div class="flex gap-1">
+                        <iconify-icon icon="lucide:star" width="20" class="text-gold"></iconify-icon>
+                        <iconify-icon icon="lucide:star" width="20" class="text-gold"></iconify-icon>
+                        <iconify-icon icon="lucide:star" width="20" class="text-gold"></iconify-icon>
+                        <iconify-icon icon="lucide:star" width="20" class="text-gold"></iconify-icon>
+                        <iconify-icon icon="lucide:star" width="20" class="text-gold"></iconify-icon>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-24 md:py-32 bg-forest relative overflow-hidden">
+        <div class="absolute inset-0">
+            <img src="https://images.unsplash.com/photo-1445116572660-236099ec97a0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2071&q=80" 
+                 alt="咖啡店环境" 
+                 class="w-full h-full object-cover opacity-20">
+        </div>
+        <div class="relative z-10 max-w-4xl mx-auto px-6 md:px-12 text-center">
+            <h2 class="font-display text-4xl md:text-5xl lg:text-6xl text-cream font-semibold mb-8">
+                开启您的咖啡疗愈之旅
+            </h2>
+            <p class="text-cream/80 text-lg md:text-xl leading-relaxed mb-12 max-w-3xl mx-auto">
+                今天就到访完治咖啡，让我们的咖啡师为您精心调制一杯专属的平静时刻。
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button class="magnetic-btn bg-cream text-forest px-8 py-4 rounded-full font-medium text-lg hover:bg-cream/90 transition-all duration-300 hover:shadow-lg hover:shadow-cream/20">
+                    <span class="flex items-center justify-center gap-3">
+                        <iconify-icon icon="lucide:map-pin" width="20"></iconify-icon>
+                        <span>查找最近门店</span>
+                    </span>
+                </button>
+                <button class="magnetic-btn border-2 border-cream/30 text-cream px-8 py-4 rounded-full font-medium text-lg hover:bg-cream/10 transition-all duration-300">
+                    <span class="flex items-center justify-center gap-3">
+                        <iconify-icon icon="lucide:calendar" width="20"></iconify-icon>
+                        <span>预约体验</span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-16 md:py-24 bg-forest/95 text-cream/80">
+        <div class="max-w-7xl mx-auto px-6 md:px-12">
+            <div class="grid md:grid-cols-4 gap-12 md:gap-8">
+                <!-- Logo & Description -->
+                <div class="md:col-span-2">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-12 h-12 rounded-full bg-cream flex items-center justify-center">
+                            <span class="text-forest font-display font-bold text-xl">完</span>
+                        </div>
+                        <div class="font-display font-semibold text-cream text-2xl tracking-wide">
+                            WanZhi Coffee
+                        </div>
+                    </div>
+                    <p class="text-cream/70 leading-relaxed mb-6 max-w-md">
+                        完治咖啡致力于为您提供高品质的咖啡体验与宁静的城市避风港。每一杯咖啡，都是我们对生活美学的诠释。
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-cream/10 flex items-center justify-center hover:bg-cream/20 transition-colors">
+                            <iconify-icon icon="lucide:instagram" width="20"></iconify-icon>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-cream/10 flex items-center justify-center hover:bg-cream/20 transition-colors">
+                            <iconify-icon icon="lucide:facebook" width="20"></iconify-icon>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-cream/10 flex items-center justify-center hover:bg-cream/20 transition-colors">
+                            <iconify-icon icon="lucide:twitter" width="20"></iconify-icon>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-cream/10 flex items-center justify-center hover:bg-cream/20 transition-colors">
+                            <iconify-icon icon="lucide:youtube" width="20"></iconify-icon>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h4 class="font-display text-lg text-cream font-semibold mb-6">联系我们</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3">
+                            <iconify-icon icon="lucide:map-pin" width="20" class="text-gold mt-1 flex-shrink-0"></iconify-icon>
+                            <p>上海市静安区南京西路1688号<br>完治咖啡生活馆 3楼</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <iconify-icon icon="lucide:phone" width="20" class="text-gold flex-shrink-0"></iconify-icon>
+                            <p>+86 21 5888 6666</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <iconify-icon icon="lucide:mail" width="20" class="text-gold flex-shrink-0"></iconify-icon>
+                            <p>hello@wanzhicoffee.com</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opening Hours -->
+                <div>
+                    <h4 class="font-display text-lg text-cream font-semibold mb-6">营业时间</h4>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span>周一至周五</span>
+                            <span class="text-gold">8:00 - 22:00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>周六至周日</span>
+                            <span class="text-gold">9:00 - 23:00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>节假日</span>
+                            <span class="text-gold">10:00 - 21:00</span>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-6 border-t border-cream/20">
+                        <p class="text-sm text-cream/60">
+                            提供免费WiFi · 宠物友好空间 · 包场服务
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-cream/20 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-cream/60 text-sm">
+                    &copy; 2024 完治咖啡 WanZhi Coffee. 保留所有权利。
+                </p>
+                <div class="flex gap-6 text-sm text-cream/60">
+                    <a href="#" class="hover:text-cream transition-colors">隐私政策</a>
+                    <a href="#" class="hover:text-cream transition-colors">服务条款</a>
+                    <a href="#" class="hover:text-cream transition-colors">加入我们</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Register GSAP plugins
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Magnetic Button Effect
+        document.querySelectorAll('.magnetic-btn').forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                gsap.to(btn, {
+                    x: x * 0.3,
+                    y: y * 0.3,
+                    duration: 0.6,
+                    ease: "power2.out"
+                });
+            });
+
+            btn.addEventListener('mouseleave', () => {
+                gsap.to(btn, {
+                    x: 0,
+                    y: 0,
+                    duration: 0.8,
+                    ease: "elastic.out(1, 0.5)"
+                });
+            });
+        });
+
+        // Hero Text Animation
+        const heroTitle = document.getElementById('hero-title');
+        const heroSubtitle = document.getElementById('hero-subtitle');
+        const heroTagline = document.getElementById('hero-tagline');
+        const heroCta = document.getElementById('hero-cta');
+
+        // Split text into characters for animation
+        function splitText(element) {
+            const text = element.textContent;
+            element.innerHTML = '';
+            text.split('').forEach(char => {
+                const span = document.createElement('span');
+                span.className = 'char';
+                span.textContent = char === ' ' ? '\u00A0' : char;
+                element.appendChild(span);
+            });
+        }
+
+        splitText(heroTitle);
+        splitText(heroSubtitle);
+        splitText(heroTagline);
+
+        // Animate hero elements
+        gsap.to('.char', {
+            opacity: 1,
+            y: 0,
+            rotateX: 0,
+            duration: 0.8,
+            stagger: 0.03,
+            ease: "back.out(1.7)",
+            delay: 0.5
+        });
+
+        gsap.from(heroCta, {
+            opacity: 0,
+            y: 30,
+            duration: 1,
+            delay: 1.8,
+            ease: "power3.out"
+        });
+
+        // Scroll Animations for Story Cards
+        gsap.utils.toArray('.story-card').forEach((card, i) => {
+            gsap.from(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top 85%",
+                    toggleActions: "play none none none"
+                },
+                opacity: 0,
+                y: 60,
+                duration: 0.8,
+                delay: i * 0.15,
+                ease: "power3.out"
+            });
+        });
+
+        // Scroll Animations for Signature Coffee
+        gsap.utils.toArray('.signature-coffee').forEach((coffee, i) => {
+            gsap.from(coffee, {
+                scrollTrigger: {
+                    trigger: coffee,
+                    start: "top 85%",
+                    toggleActions: "play none none none"
+                },
+                opacity: 0,
+                y: 80,
+                duration: 1,
+                delay: i * 0.2,
+                ease: "power3.out"
+            });
+        });
+
+        // Parallax Effect for Experience Section
+        gsap.to('.parallax-bg', {
+            scrollTrigger: {
+                trigger: '#experience',
+                start: "top bottom",
+                end: "bottom top",
+                scrub: true
+            },
+            y: -100,
+            ease: "none"
+        });
+
+        // Scroll Animations for Menu Cards
+        gsap.utils.toArray('.menu-card').forEach((card, i) => {
+            gsap.from(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top 90%",
+                    toggleActions: "play none none none"
+                },
+                opacity: 0,
+                y: 50,
+                scale: 0.95,
+                duration: 0.8,
+                delay: i * 0.12,
+                ease: "power3.out"
+            });
+        });
+
+        // Scroll Animations for Testimonials
+        gsap.utils.toArray('.testimonial-card').forEach((card, i) => {
+            gsap.from(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top 85%",
+                    toggleActions: "play none none none"
+                },
+                opacity: 0,
+                scale: 0.95,
+                duration: 0.9,
+                delay: i * 0.2,
+                ease: "back.out(1.7)"
+            });
+        });
+
+        // Navigation background on scroll
+        const nav = document.querySelector('nav');
+        ScrollTrigger.create({
+            start: "top -100",
+            end: 99999,
+            toggleClass: { className: "bg-cream/90 backdrop-blur-md shadow-lg", targets: nav }
+        });
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    gsap.to(window, {
+                        duration: 1,
+                        scrollTo: {
+                            y: target,
+                            offsetY: 80
+                        },
+                        ease: "power2.inOut"
+                    });
+                }
+            });
+        });
+
+        // Initialize scroll animations
+        window.addEventListener('load', () => {
+            ScrollTrigger.refresh();
+        });
+    </script>
+</body>
+</html>
