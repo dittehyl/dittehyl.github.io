@@ -1,0 +1,1969 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="花蓮縣立美崙國中｜Meilun Junior High School｜以愛為名，勇敢追夢在美崙。" />
+  <title>花蓮縣立美崙國中｜Meilun Junior High School</title>
+  <meta name="theme-color" content="#08131d" />
+
+  <script>
+    window.tailwind = {
+      config: {
+        theme: {
+          extend: {
+            colors: {
+              ink: '#07111a',
+              slatex: '#0d1823',
+              jade: '#6fe1c7',
+              gold: '#f4d35e',
+              mist: '#d8e6ee',
+              skyx: '#7aa8ff'
+            },
+            fontFamily: {
+              sans: ['Noto Sans TC', 'Inter', 'system-ui', 'sans-serif'],
+              display: ['Outfit', 'Noto Sans TC', 'system-ui', 'sans-serif']
+            },
+            boxShadow: {
+              glow: '0 0 0 1px rgba(255,255,255,.08), 0 24px 80px rgba(0,0,0,.28)',
+              soft: '0 20px 70px rgba(0,0,0,.25)'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r155/three.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #07111a;
+      --bg-soft: #0d1823;
+      --panel: rgba(255,255,255,.08);
+      --panel-strong: rgba(255,255,255,.12);
+      --line: rgba(255,255,255,.11);
+      --text: #edf5f8;
+      --muted: #9bb0bf;
+      --jade: #6fe1c7;
+      --gold: #f4d35e;
+      --sky: #7aa8ff;
+      --radius-xs: 12px;
+      --radius-sm: 18px;
+      --radius-md: 26px;
+      --radius-lg: 34px;
+      --radius-xl: 48px;
+      --max: 1280px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Noto Sans TC', 'Inter', system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 20%, rgba(111,225,199,.12), transparent 28%),
+        radial-gradient(circle at 88% 14%, rgba(122,168,255,.15), transparent 26%),
+        radial-gradient(circle at 50% 120%, rgba(244,211,94,.08), transparent 42%),
+        linear-gradient(180deg, #061018 0%, #08131d 42%, #07111a 100%);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    @media (pointer: coarse) {
+      body { cursor: auto; }
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    #webgl-canvas,
+    #grain,
+    #site-guides,
+    #cursor-ring,
+    #cursor-dot {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    #webgl-canvas {
+      width: 100%;
+      height: 100%;
+      opacity: .62;
+      filter: saturate(115%);
+    }
+
+    #site-guides {
+      z-index: 1;
+      opacity: .34;
+      background-image:
+        linear-gradient(90deg, transparent calc(50% - min(46vw, 640px)), rgba(255,255,255,.08) calc(50% - min(46vw, 640px) + 1px), transparent calc(50% - min(46vw, 640px) + 2px)),
+        linear-gradient(90deg, transparent calc(50% - min(23vw, 320px)), rgba(255,255,255,.05) calc(50% - min(23vw, 320px) + 1px), transparent calc(50% - min(23vw, 320px) + 2px)),
+        linear-gradient(90deg, transparent calc(50% + min(23vw, 320px)), rgba(255,255,255,.05) calc(50% + min(23vw, 320px) + 1px), transparent calc(50% + min(23vw, 320px) + 2px)),
+        linear-gradient(90deg, transparent calc(50% + min(46vw, 640px)), rgba(255,255,255,.08) calc(50% + min(46vw, 640px) + 1px), transparent calc(50% + min(46vw, 640px) + 2px));
+    }
+
+    #grain {
+      z-index: 10;
+      opacity: .1;
+      mix-blend-mode: soft-light;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='0.75'/%3E%3C/svg%3E");
+      animation: grainShift 6s steps(6) infinite;
+    }
+
+    @keyframes grainShift {
+      0%, 100% { transform: translate(0,0); }
+      20% { transform: translate(-1.5%, 1%); }
+      40% { transform: translate(1.5%, -1.2%); }
+      60% { transform: translate(.8%, 1.3%); }
+      80% { transform: translate(-1%, -.7%); }
+    }
+
+    #cursor-ring,
+    #cursor-dot {
+      width: 100%;
+      height: 100%;
+      z-index: 80;
+      mix-blend-mode: difference;
+    }
+
+    .cursor-ring-inner,
+    .cursor-dot-inner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: translate(-50%, -50%);
+      border-radius: 999px;
+      pointer-events: none;
+      will-change: transform, width, height, opacity;
+    }
+
+    .cursor-ring-inner {
+      width: 34px;
+      height: 34px;
+      border: 1px solid rgba(255,255,255,.95);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 0 24px rgba(255,255,255,.18);
+    }
+
+    .cursor-dot-inner {
+      width: 6px;
+      height: 6px;
+      background: rgba(255,255,255,.98);
+    }
+
+    @media (pointer: coarse) {
+      #cursor-ring,
+      #cursor-dot { display: none; }
+    }
+
+    .container-shell {
+      width: min(var(--max), calc(100% - 32px));
+      margin-inline: auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .section-wrap {
+      position: relative;
+      padding: 5rem 0;
+      isolation: isolate;
+    }
+
+    .section-wrap::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: min(var(--max), calc(100% - 32px));
+      transform: translateX(-50%);
+      border-inline: 1px solid rgba(255,255,255,.03);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glass {
+      position: relative;
+      background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.1);
+      box-shadow: 0 16px 80px rgba(0,0,0,.22);
+      backdrop-filter: blur(16px) saturate(120%);
+      -webkit-backdrop-filter: blur(16px) saturate(120%);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .glass::after,
+    .beam::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg, transparent 20%, rgba(255,255,255,.18) 50%, transparent 80%);
+      transform: translateX(-140%);
+      opacity: .4;
+      pointer-events: none;
+    }
+
+    .beam:hover::after,
+    .glass:hover::after {
+      animation: beamPass 1.2s ease forwards;
+    }
+
+    @keyframes beamPass {
+      from { transform: translateX(-140%); }
+      to { transform: translateX(160%); }
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .55rem .9rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      font-size: .84rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #d7e4eb;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.03);
+    }
+
+    .eyebrow iconify-icon {
+      font-size: 1rem;
+      color: var(--jade);
+    }
+
+    .display-title {
+      font-family: 'Outfit', 'Noto Sans TC', sans-serif;
+      font-weight: 800;
+      line-height: .96;
+      letter-spacing: -.04em;
+      text-wrap: balance;
+    }
+
+    .muted {
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .cta-primary,
+    .cta-secondary {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .6rem;
+      border-radius: 999px;
+      padding: 1rem 1.35rem;
+      font-weight: 700;
+      overflow: hidden;
+      transition: transform .35s ease, border-color .35s ease, background .35s ease;
+      will-change: transform;
+    }
+
+    .cta-primary {
+      color: #08131d;
+      background: linear-gradient(135deg, var(--jade), #99ffe8 55%, var(--gold));
+      box-shadow: 0 18px 40px rgba(111,225,199,.18);
+    }
+
+    .cta-secondary {
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+    }
+
+    .cta-primary:hover,
+    .cta-secondary:hover {
+      transform: translateY(-2px);
+    }
+
+    .section-number {
+      position: absolute;
+      top: 1rem;
+      left: max(16px, calc(50% - min(46vw, 640px) + 12px));
+      font-size: clamp(2.6rem, 5vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1;
+      color: rgba(255,255,255,.06);
+      z-index: 0;
+      pointer-events: none;
+      font-family: 'Outfit', sans-serif;
+      letter-spacing: -.06em;
+    }
+
+    header.hero {
+      position: relative;
+      min-height: 100svh;
+      display: flex;
+      align-items: stretch;
+      overflow: clip;
+      padding-bottom: 1rem;
+      isolation: isolate;
+    }
+
+    .hero-slices,
+    .hero-fog,
+    .hero-vignette,
+    .hero-liquid {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .hero-slice {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 25%;
+      background-size: 400% 100%;
+      background-position: var(--bgpos) 50%;
+      background-repeat: no-repeat;
+      filter: saturate(1.08) brightness(.75) contrast(1.05);
+      transform: translateY(-110%) scale(1.08);
+      will-change: transform;
+      border-left: 1px solid rgba(255,255,255,.06);
+      border-right: 1px solid rgba(255,255,255,.06);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.03);
+    }
+
+    .hero-slice:nth-child(1) { left: 0%; }
+    .hero-slice:nth-child(2) { left: 25%; }
+    .hero-slice:nth-child(3) { left: 50%; }
+    .hero-slice:nth-child(4) { left: 75%; }
+
+    .hero-fog {
+      background:
+        linear-gradient(180deg, rgba(4,9,13,.2) 0%, rgba(4,10,15,.66) 60%, rgba(7,17,26,.96) 100%),
+        radial-gradient(circle at 22% 18%, rgba(111,225,199,.18), transparent 28%),
+        radial-gradient(circle at 78% 24%, rgba(122,168,255,.22), transparent 26%),
+        radial-gradient(circle at 52% 65%, rgba(244,211,94,.08), transparent 30%);
+      z-index: 1;
+    }
+
+    .hero-vignette {
+      background: radial-gradient(circle at center, transparent 42%, rgba(0,0,0,.28) 100%);
+      z-index: 2;
+    }
+
+    .hero-liquid {
+      z-index: 3;
+      mix-blend-mode: screen;
+      overflow: hidden;
+      opacity: .9;
+    }
+
+    .liquid-blob {
+      position: absolute;
+      width: 38vw;
+      aspect-ratio: 1 / 1;
+      border-radius: 43% 57% 58% 42% / 38% 40% 60% 62%;
+      filter: blur(48px);
+      opacity: .18;
+      background: radial-gradient(circle at 30% 30%, rgba(111,225,199,.78), rgba(122,168,255,.22) 55%, transparent 72%);
+    }
+
+    .liquid-blob.-a { left: -8%; top: 10%; }
+    .liquid-blob.-b { right: -4%; top: 22%; width: 32vw; }
+    .liquid-blob.-c { left: 26%; bottom: -8%; width: 42vw; background: radial-gradient(circle at 30% 30%, rgba(244,211,94,.78), rgba(111,225,199,.24) 55%, transparent 72%); }
+
+    .hero-nav {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      z-index: 12;
+      padding-top: 1rem;
+    }
+
+    .nav-shell {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: .9rem 1rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 12px 30px rgba(0,0,0,.18);
+    }
+
+    .brand-lockup {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      color: #07111a;
+      background: linear-gradient(135deg, var(--jade), var(--gold));
+      box-shadow: 0 10px 30px rgba(111,225,199,.22);
+      flex: 0 0 auto;
+    }
+
+    .brand-lockup small {
+      display: block;
+      color: var(--muted);
+      font-size: .72rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: none;
+      align-items: center;
+      gap: 1.1rem;
+      color: #d6e2e9;
+      font-size: .95rem;
+    }
+
+    @media (min-width: 960px) {
+      .nav-links { display: flex; }
+    }
+
+    .nav-links a {
+      position: relative;
+      padding-bottom: .2rem;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.9), transparent);
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform .35s ease;
+    }
+
+    .nav-links a:hover::after { transform: scaleX(1); }
+
+    .hero-grid {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      min-height: 100svh;
+      display: grid;
+      align-items: end;
+      padding: 8.2rem 0 2rem;
+    }
+
+    .hero-main {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      align-items: end;
+    }
+
+    @media (min-width: 1100px) {
+      .hero-main {
+        grid-template-columns: minmax(0, 1.2fr) minmax(330px, .8fr);
+        gap: 2.4rem;
+      }
+    }
+
+    .hero-heading-wrap {
+      max-width: 850px;
+    }
+
+    .hero-kicker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .75rem;
+      margin-bottom: 1.1rem;
+    }
+
+    .hero-title {
+      font-size: clamp(3rem, 8vw, 7rem);
+      margin: 0;
+    }
+
+    .hero-title .line {
+      display: block;
+      overflow: clip;
+      padding-bottom: .08em;
+    }
+
+    .hero-title .line span,
+    .hero-copy,
+    .hero-actions,
+    .hero-chip,
+    .reveal-up {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+
+    .hero-copy {
+      max-width: 62ch;
+      font-size: clamp(1.05rem, 1.6vw, 1.2rem);
+      line-height: 1.9;
+      color: #d9e6ed;
+      margin: 1.2rem 0 0;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .9rem;
+      margin-top: 2rem;
+    }
+
+    .hero-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .8rem;
+      margin-top: 1.6rem;
+    }
+
+    .hero-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: .55rem;
+      padding: .72rem 1rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      color: #e6f1f4;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.03);
+    }
+
+    .hero-side {
+      align-self: end;
+    }
+
+    .hero-panel {
+      padding: 1.15rem;
+      border-radius: calc(var(--radius-lg) + 4px);
+    }
+
+    .hero-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: .8rem;
+      margin-top: 1rem;
+    }
+
+    .stat-card {
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      min-height: 124px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .stat-card strong {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(1.9rem, 4vw, 2.9rem);
+      line-height: .95;
+      letter-spacing: -.05em;
+      margin-bottom: .45rem;
+    }
+
+    .stat-card small {
+      color: var(--muted);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      font-size: .72rem;
+    }
+
+    .hero-quote {
+      margin-top: 1rem;
+      padding: 1rem 1.05rem;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, rgba(111,225,199,.12), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .hero-scroll {
+      position: absolute;
+      right: max(16px, calc(50% - min(46vw, 640px) + 12px));
+      bottom: 18px;
+      z-index: 12;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .5rem;
+      color: rgba(255,255,255,.78);
+      font-size: .72rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .hero-scroll span:last-child {
+      width: 1px;
+      height: 64px;
+      background: linear-gradient(180deg, rgba(255,255,255,.7), transparent);
+      animation: scrollDrift 1.6s ease-in-out infinite;
+      transform-origin: top;
+    }
+
+    @keyframes scrollDrift {
+      0%, 100% { transform: scaleY(.35); opacity: .55; }
+      50% { transform: scaleY(1); opacity: 1; }
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    @media (min-width: 880px) {
+      .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    .value-card,
+    .milestone-card,
+    .logo-card,
+    .focus-card,
+    .record-card,
+    .timeline-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255,255,255,.1);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      box-shadow: 0 20px 70px rgba(0,0,0,.18);
+    }
+
+    .value-card,
+    .milestone-card,
+    .record-card,
+    .timeline-card,
+    .logo-card {
+      padding: 1.15rem;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .value-card iconify-icon,
+    .milestone-card iconify-icon,
+    .focus-card .focus-icon,
+    .record-card iconify-icon,
+    .timeline-card iconify-icon {
+      font-size: 1.2rem;
+      color: var(--jade);
+    }
+
+    .value-card h3,
+    .focus-card h3,
+    .record-card h3,
+    .timeline-card h3 { margin: .8rem 0 .55rem; }
+
+    .text-balance { text-wrap: balance; }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 1.4rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.8rem;
+    }
+
+    .section-head p { max-width: 60ch; }
+
+    .partner-strip {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: .9rem;
+    }
+
+    @media (min-width: 760px) {
+      .partner-strip { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    }
+
+    .logo-card {
+      display: grid;
+      place-items: center;
+      gap: .5rem;
+      text-align: center;
+      min-height: 118px;
+      transition: transform .35s ease, border-color .35s ease;
+    }
+
+    .logo-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(111,225,199,.28);
+    }
+
+    .logo-card iconify-icon {
+      font-size: 2rem;
+    }
+
+    .marquee-wrap {
+      position: relative;
+      overflow: hidden;
+      border-block: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      gap: 1rem;
+      padding: .95rem 0;
+      animation: marqueeMove 26s linear infinite;
+      will-change: transform;
+    }
+
+    .marquee-item {
+      display: inline-flex;
+      align-items: center;
+      gap: .65rem;
+      color: #e8f1f5;
+      font-size: .95rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      padding: 0 1rem;
+    }
+
+    .marquee-item iconify-icon { color: var(--gold); }
+
+    @keyframes marqueeMove {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    .vision-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    @media (min-width: 1024px) {
+      .vision-grid {
+        grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr);
+      }
+    }
+
+    .image-stack {
+      position: relative;
+      min-height: 580px;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(255,255,255,.06);
+      box-shadow: 0 20px 70px rgba(0,0,0,.18);
+    }
+
+    .image-stack img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.02);
+    }
+
+    .image-stack .overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(5,9,13,.08), rgba(5,9,13,.18) 40%, rgba(5,9,13,.78) 100%);
+    }
+
+    .image-stack .caption {
+      position: absolute;
+      inset: auto 1rem 1rem 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: .75rem;
+      align-items: end;
+      justify-content: space-between;
+    }
+
+    .float-card {
+      position: absolute;
+      border-radius: var(--radius-md);
+      padding: .9rem 1rem;
+      background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.06));
+      border: 1px solid rgba(255,255,255,.1);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 12px 36px rgba(0,0,0,.16);
+      max-width: 250px;
+    }
+
+    .float-card.-one { top: 1rem; right: 1rem; }
+    .float-card.-two { left: 1rem; bottom: 7rem; }
+
+    .focus-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    @media (min-width: 900px) {
+      .focus-grid {
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+      }
+      .focus-grid .focus-card:nth-child(1) { grid-column: span 7; min-height: 430px; }
+      .focus-grid .focus-card:nth-child(2) { grid-column: span 5; min-height: 430px; }
+      .focus-grid .focus-card:nth-child(3) { grid-column: span 5; min-height: 380px; }
+      .focus-grid .focus-card:nth-child(4) { grid-column: span 4; min-height: 380px; }
+      .focus-grid .focus-card:nth-child(5) { grid-column: span 3; min-height: 380px; }
+    }
+
+    .focus-card {
+      min-height: 360px;
+      display: flex;
+      align-items: end;
+      isolation: isolate;
+      transition: transform .45s ease, border-color .35s ease;
+    }
+
+    .focus-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(111,225,199,.3);
+    }
+
+    .focus-card img,
+    .focus-card .overlay {
+      position: absolute;
+      inset: 0;
+    }
+
+    .focus-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .7s ease;
+    }
+
+    .focus-card:hover img {
+      transform: scale(1.06);
+    }
+
+    .focus-card .overlay {
+      background:
+        linear-gradient(180deg, rgba(4,8,12,.04) 0%, rgba(4,8,12,.18) 35%, rgba(4,8,12,.9) 100%),
+        radial-gradient(circle at top left, rgba(111,225,199,.18), transparent 40%);
+      z-index: 0;
+    }
+
+    .focus-card .content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      padding: 1.2rem;
+    }
+
+    .focus-icon {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      margin-bottom: .9rem;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    @media (min-width: 1024px) {
+      .metrics-grid {
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+      }
+    }
+
+    .metric-shell {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: .9rem;
+    }
+
+    .metric-card {
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(255,255,255,.05);
+      min-height: 150px;
+    }
+
+    .metric-card strong {
+      display: block;
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: .92;
+      letter-spacing: -.05em;
+      margin-bottom: .45rem;
+    }
+
+    .records-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    @media (min-width: 1120px) {
+      .records-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    .record-card ul,
+    .record-card ol {
+      margin: .85rem 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: .65rem;
+      max-height: 430px;
+      overflow: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,.22) transparent;
+    }
+
+    .record-card ul::-webkit-scrollbar,
+    .record-card ol::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+
+    .record-card ul::-webkit-scrollbar-thumb,
+    .record-card ol::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,.24);
+      border-radius: 999px;
+    }
+
+    .record-item {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: .8rem;
+      padding: .75rem .85rem;
+      border-radius: 18px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.06);
+    }
+
+    .record-item span:last-child {
+      white-space: nowrap;
+      color: #dff8ef;
+      font-weight: 700;
+    }
+
+    .timeline-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    @media (min-width: 980px) {
+      .timeline-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+
+    .timeline-card {
+      min-height: 210px;
+    }
+
+    .timeline-year {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.35rem;
+      line-height: .92;
+      letter-spacing: -.06em;
+      color: #ffffff;
+      margin-top: .65rem;
+    }
+
+    .footer-panel {
+      padding: 1.25rem;
+      border-radius: var(--radius-xl);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.1), rgba(255,255,255,.04)),
+        radial-gradient(circle at top left, rgba(111,225,199,.18), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(244,211,94,.14), transparent 28%);
+      border: 1px solid rgba(255,255,255,.1);
+      box-shadow: 0 18px 70px rgba(0,0,0,.2);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .footer-panel::before {
+      content: '';
+      position: absolute;
+      inset: -20%;
+      background: radial-gradient(circle, rgba(255,255,255,.12), transparent 48%);
+      filter: blur(18px);
+      opacity: .5;
+      pointer-events: none;
+    }
+
+    .tilt-card {
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      padding: .42rem .74rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      font-size: .82rem;
+      color: #dbe7ed;
+    }
+
+    .muted-note {
+      font-size: .85rem;
+      color: rgba(219,231,237,.74);
+      line-height: 1.7;
+    }
+
+    [data-reveal],
+    [data-stagger] > * {
+      opacity: 0;
+      transform: translateY(28px);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    @media (max-width: 768px) {
+      .section-wrap { padding: 4rem 0; }
+      .hero-scroll { display: none; }
+      .hero-title { font-size: clamp(2.8rem, 14vw, 4.6rem); }
+      .hero-copy { font-size: 1rem; }
+      .hero-panel { padding: 1rem; }
+      .hero-stat-grid { gap: .7rem; }
+      .stat-card { min-height: 112px; }
+      .image-stack { min-height: 420px; }
+      .section-number {
+        left: auto;
+        right: 16px;
+        top: .5rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+      }
+      [data-reveal],
+      [data-stagger] > *,
+      .hero-title .line span,
+      .hero-copy,
+      .hero-chip,
+      .reveal-up {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+      .hero-slice { transform: translateY(0) scale(1.02) !important; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="webgl-canvas" aria-hidden="true"></canvas>
+  <div id="site-guides" aria-hidden="true"></div>
+  <div id="grain" aria-hidden="true"></div>
+  <div id="cursor-ring" aria-hidden="true"><span class="cursor-ring-inner"></span></div>
+  <div id="cursor-dot" aria-hidden="true"><span class="cursor-dot-inner"></span></div>
+
+  <header id="top" class="hero">
+    <div class="hero-slices" aria-hidden="true">
+      <div class="hero-slice" style="background-image:url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=80'); --bgpos:0%;"></div>
+      <div class="hero-slice" style="background-image:url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=80'); --bgpos:33.33%;"></div>
+      <div class="hero-slice" style="background-image:url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=80'); --bgpos:66.66%;"></div>
+      <div class="hero-slice" style="background-image:url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1800&q=80'); --bgpos:100%;"></div>
+    </div>
+    <div class="hero-fog"></div>
+    <div class="hero-vignette"></div>
+    <div class="hero-liquid" aria-hidden="true">
+      <span class="liquid-blob -a"></span>
+      <span class="liquid-blob -b"></span>
+      <span class="liquid-blob -c"></span>
+    </div>
+
+    <div class="hero-nav">
+      <div class="container-shell">
+        <div class="nav-shell beam">
+          <a class="brand-lockup" href="#top" aria-label="回到頁首">
+            <span class="brand-mark"><iconify-icon icon="lucide:mountain"></iconify-icon></span>
+            <div class="min-w-0">
+              <strong class="block text-sm sm:text-base truncate">花蓮縣立美崙國中</strong>
+              <small>Meilun 1965 • Brave Beyond</small>
+            </div>
+          </a>
+          <nav class="nav-links">
+            <a href="#values">品牌主張</a>
+            <a href="#focus">教育亮點</a>
+            <a href="#legacy">足球榮耀</a>
+            <a href="#timeline">里程碑</a>
+            <a href="https://forms.gle/8dudPWcy7Jfembqc9" target="_blank" rel="noopener" style="color: #ff4444;">足球隊招生中</a>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-grid">
+      <div class="container-shell">
+        <div class="hero-main">
+          <div class="hero-heading-wrap">
+            <div class="hero-kicker">
+              <span class="eyebrow reveal-up"><iconify-icon icon="lucide:sparkles"></iconify-icon>Autonomous Brand Direction</span>
+              <span class="eyebrow reveal-up"><iconify-icon icon="lucide:heart-handshake"></iconify-icon>以愛為名・勇敢追夢</span>
+            </div>
+            <h1 class="display-title hero-title">
+              <span class="line"><span>MEILUN</span></span>
+              <span class="line"><span>勇敢追夢在美崙</span></span>
+            </h1>
+            <p class="hero-copy">創校於 1965，花蓮市第一所縣立國中。美崙把「愛」化成教育的底色，讓孩子立足美崙、胸懷世界，在藝術、人文、足球與多元學習中，看見自己、肯定自己，並以更寬闊的視野走向未來。</p>
+            <div class="hero-actions reveal-up">
+              <a href="#values" class="cta-primary magnetic">
+                走進美崙精神
+                <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+              </a>
+              <a href="#legacy" class="cta-secondary magnetic">
+                查看榮耀紀錄
+                <iconify-icon icon="lucide:trophy"></iconify-icon>
+              </a>
+            </div>
+            <div class="hero-chips">
+              <span class="hero-chip"><iconify-icon icon="lucide:heart"></iconify-icon>核心價值｜以愛育人</span>
+              <span class="hero-chip"><iconify-icon icon="lucide:globe-2"></iconify-icon>核心價值｜世界接軌</span>
+              <span class="hero-chip"><iconify-icon icon="lucide:sparkles"></iconify-icon>核心價值｜卓越成長</span>
+            </div>
+          </div>
+
+          <aside class="hero-side reveal-up">
+            <div class="glass hero-panel tilt-card beam">
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <div class="text-xs uppercase tracking-[0.24em] text-slate-300">Brand Signal</div>
+                  <h2 class="mt-2 text-2xl font-semibold text-balance">Meilun 1965 — Love, Vision, Courage</h2>
+                </div>
+                <span class="pill"><iconify-icon icon="lucide:badge-check"></iconify-icon>WebGL Visualist</span>
+              </div>
+              <div class="hero-stat-grid">
+                <div class="stat-card">
+                  <div>
+                    <small>創校年份</small>
+                    <strong>1965</strong>
+                  </div>
+                  <p class="muted !leading-relaxed !text-sm">花蓮市第一所縣立國中，自創校以來傳承教育溫度。</p>
+                </div>
+                <div class="stat-card">
+                  <div>
+                    <small>全國級冠軍</small>
+                    <strong>31</strong>
+                  </div>
+                  <p class="muted !leading-relaxed !text-sm">青少年盃、足球聯賽、全中運累積 31 座冠軍里程碑。</p>
+                </div>
+                <div class="stat-card">
+                  <div>
+                    <small>重要榮耀</small>
+                    <strong>11</strong>
+                  </div>
+                  <p class="muted !leading-relaxed !text-sm">全國中等學校足球聯賽與全中運冠軍總數高達 11 次。</p>
+                </div>
+                <div class="stat-card">
+                  <div>
+                    <small>足球啟動</small>
+                    <strong>1994</strong>
+                  </div>
+                  <p class="muted !leading-relaxed !text-sm">足球隊成軍，長期培育優秀選手，走向全國與國際舞台。</p>
+                </div>
+              </div>
+              <div class="hero-quote">
+                <p class="text-lg leading-relaxed text-slate-100">「讓夢想在這裡開場，讓孩子在愛中發光。」</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+  </header>
+
+  <section class="marquee-wrap" aria-label="學校願景跑馬燈">
+    <div class="marquee-track">
+      <span class="marquee-item"><iconify-icon icon="lucide:sun-medium"></iconify-icon>樂觀進取</span>
+      <span class="marquee-item"><iconify-icon icon="lucide:rocket"></iconify-icon>追求卓越</span>
+      <span class="marquee-item"><iconify-icon icon="lucide:heart-handshake"></iconify-icon>以愛為名</span>
+      <span class="marquee-item"><iconify-icon icon="lucide:shield-check"></iconify-icon>健康</span>
+      <span class="marquee-item"><iconify-icon icon="lucide:gem"></iconify-icon>品格</span>
+      <span class="marquee-item"><iconify-icon icon="lucide:book-open-text"></iconify-icon>樂學</span>
+      <span class="marquee-item"><iconify-icon icon="lucide:mountain"></iconify-icon>美崙</span>
+      <span class="marquee-item"><iconify-icon icon="lucide:sun-medium"></iconify-icon>樂觀進取</span>
+      <span class="marquee-item"><iconify-icon icon="lucide:rocket"></iconify-icon>追求卓越</span>
+      <span class="marquee-item"><iconify-icon icon="lucide:heart-handshake"></iconify-icon>以愛為名</span>
+      <span class="marquee-item"><iconify-icon icon="lucide:shield-check"></iconify-icon>健康</span>
+      <span class="marquee-item"><iconify-icon icon="lucide:gem"></iconify-icon>品格</span>
+      <span class="marquee-item"><iconify-icon icon="lucide:book-open-text"></iconify-icon>樂學</span>
+      <span class="marquee-item"><iconify-icon icon="lucide:mountain"></iconify-icon>美崙</span>
+    </div>
+  </section>
+
+  <main>
+    <section id="values" class="section-wrap">
+      <div class="section-number">01</div>
+      <div class="container-shell">
+        <div class="section-head" data-reveal>
+          <div>
+            <span class="eyebrow"><iconify-icon icon="lucide:layout-grid"></iconify-icon>Autonomous Branding</span>
+            <h2 class="display-title mt-4 text-4xl md:text-5xl">把山海的氣魄，化成孩子成長的座標</h2>
+          </div>
+          <p class="muted">從美崙出發，我們不只教知識，更塑造品格、培養眼界、建立自信。這裡像一座有溫度的成長場域：藝術薰陶、人文深耕、體育成就與國際交流並進，讓每個孩子都能找到自己的光。</p>
+        </div>
+
+        <div class="grid-2 items-start">
+          <div class="vision-grid">
+            <div class="image-stack beam" data-reveal>
+              <img src="https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=1600&q=80" alt="校園學習氛圍" data-depth="0.12" />
+              <div class="overlay"></div>
+              <div class="float-card -one tilt-card">
+                <div class="text-xs uppercase tracking-[0.24em] text-slate-300">School Vision</div>
+                <p class="mt-2 text-lg leading-relaxed">厚植品德，深耕人文，讓孩子在多變世界中找到人生定位。</p>
+              </div>
+              <div class="float-card -two tilt-card">
+                <div class="text-xs uppercase tracking-[0.24em] text-slate-300">Student Portrait</div>
+                <p class="mt-2 text-base leading-relaxed">健康、品格、樂學、美崙</p>
+              </div>
+              <div class="caption">
+                <div>
+                  <span class="pill"><iconify-icon icon="lucide:map-pinned"></iconify-icon>Hualien, Taiwan</span>
+                  <p class="mt-4 max-w-xl text-xl leading-relaxed text-white">綠草如茵、藍天為幕，校園像公園一般宜人，給予孩子足夠寬闊的視野與呼吸感。</p>
+                </div>
+                <span class="pill"><iconify-icon icon="lucide:trees"></iconify-icon>藝術 × 人文 × 歷史</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid gap-4" data-stagger>
+            <article class="value-card beam tilt-card">
+              <span class="pill"><iconify-icon icon="lucide:heart"></iconify-icon>核心價值主張 01</span>
+              <h3 class="text-2xl font-semibold">以愛育人，讓每個孩子被看見</h3>
+              <p class="muted">教育無礙，從心出發。尊重個別差異，看見每位學生的亮點，成為生命中的支持者與陪伴者，讓愛成為校園最長久的語言。</p>
+            </article>
+            <article class="value-card beam tilt-card">
+              <span class="pill"><iconify-icon icon="lucide:globe-2"></iconify-icon>核心價值主張 02</span>
+              <h3 class="text-2xl font-semibold">與世界同頻，建立國際行動力</h3>
+              <p class="muted">透過國際夥伴交流與外師計畫，提升英語力與跨文化理解，讓孩子不只學習語言，更學會站在世界地圖上思考未來。</p>
+            </article>
+            <article class="value-card beam tilt-card">
+              <span class="pill"><iconify-icon icon="lucide:trophy"></iconify-icon>核心價值主張 03</span>
+              <h3 class="text-2xl font-semibold">勇於卓越，把天賦練成實力</h3>
+              <p class="muted">從藝術美感到足球榮耀，從閱讀創課到團隊合作，美崙鼓勵孩子在不同舞台發光，把興趣、品格與成就連成一條成長曲線。</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="focus" class="section-wrap">
+      <div class="section-number">02</div>
+      <div class="container-shell">
+        <div class="section-head" data-reveal>
+          <div>
+            <span class="eyebrow"><iconify-icon icon="lucide:layers-3"></iconify-icon>Education Highlights</span>
+            <h2 class="display-title mt-4 text-4xl md:text-5xl">五大亮點，讓學習不只在教室發生</h2>
+          </div>
+          <p class="muted">美崙的教育現場，是一場多層次、跨領域、具體可感的成長實驗。從國際交流、音樂美學到國家級足球環境，學習在這裡變成立體而鮮明的日常。</p>
+        </div>
+
+        <div class="focus-grid" data-stagger>
+          <article class="focus-card beam tilt-card">
+            <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80" alt="國際教育" data-depth="0.15" />
+            <div class="overlay"></div>
+            <div class="content">
+              <div class="focus-icon"><iconify-icon icon="lucide:globe-2"></iconify-icon></div>
+              <span class="pill">國際｜教育</span>
+              <h3 class="text-3xl font-semibold">把英語力與世界觀，變成孩子的第二本能</h3>
+              <p class="mt-3 max-w-2xl text-slate-100/88 leading-relaxed">推動國際夥伴交流與外師專案計畫，讓學生在真實互動中提升英語能力，理解不同文化，建立面向國際的自信與表達力。</p>
+            </div>
+          </article>
+
+          <article class="focus-card beam tilt-card">
+            <img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1600&q=80" alt="音樂美學" data-depth="0.18" />
+            <div class="overlay"></div>
+            <div class="content">
+              <div class="focus-icon"><iconify-icon icon="lucide:music"></iconify-icon></div>
+              <span class="pill">薰陶｜音樂美學</span>
+              <h3 class="text-3xl font-semibold">讓藝術與音樂，把夢想的輪廓描得更清楚</h3>
+              <p class="mt-3 text-slate-100/88 leading-relaxed">透過音樂與藝術教育培養美感素養，豐富生命內涵，讓孩子在表演、欣賞與創作之間，找到更寬廣的自我表達方式。</p>
+            </div>
+          </article>
+
+          <article class="focus-card beam tilt-card">
+            <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1600&q=80" alt="足球發展" data-depth="0.15" />
+            <div class="overlay"></div>
+            <div class="content">
+              <div class="focus-icon"><iconify-icon icon="lucide:target"></iconify-icon></div>
+              <span class="pill">啟用｜足球發展</span>
+              <h3 class="text-3xl font-semibold">FIFA 認證人工草坪，讓實力在國際規格裡成形</h3>
+              <p class="mt-3 text-slate-100/88 leading-relaxed">設置 FIFA 認證標準人工草坪足球場，打造國際級運動環境。自 1994 年成立以來，足球隊多次稱霸全國，持續為國培育優秀人才。</p>
+            </div>
+          </article>
+
+          <article class="focus-card beam tilt-card">
+            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80" alt="多元學習" data-depth="0.18" />
+            <div class="overlay"></div>
+            <div class="content">
+              <div class="focus-icon"><iconify-icon icon="lucide:book-open-text"></iconify-icon></div>
+              <span class="pill">適性｜多元學習</span>
+              <h3 class="text-2xl font-semibold">閱讀、創課、人文、體育，讓能力交叉生長</h3>
+              <p class="mt-3 text-slate-100/88 leading-relaxed">推動多元課程，培養團隊合作、溝通表達與主動探索，讓每位學生都能在不同面向中建立專長與成就感。</p>
+            </div>
+          </article>
+
+          <article class="focus-card beam tilt-card">
+            <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1600&q=80" alt="差異化教育" data-depth="0.2" />
+            <div class="overlay"></div>
+            <div class="content">
+              <div class="focus-icon"><iconify-icon icon="lucide:users"></iconify-icon></div>
+              <span class="pill">重視｜差異化教育</span>
+              <h3 class="text-2xl font-semibold">尊重差異，看見每一束獨特的光</h3>
+              <p class="mt-3 text-slate-100/88 leading-relaxed">以陪伴與引導支持學生發展，不用單一標準定義優秀，而是幫助孩子找到真正適合自己的位置與節奏。</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="legacy" class="section-wrap">
+      <div class="section-number">03</div>
+      <div class="container-shell">
+        <div class="section-head" data-reveal>
+          <div>
+            <span class="eyebrow"><iconify-icon icon="lucide:trophy"></iconify-icon>Football Legacy</span>
+            <h2 class="display-title mt-4 text-4xl md:text-5xl">從美崙出發，踢出全國級的榮耀曲線</h2>
+          </div>
+          <p class="muted">美崙足球隊的歷史，不只是獎盃數字，更是一代代孩子把紀律、拼勁與團隊精神踢進生命裡的證明。從青少年盃到足球聯賽，再到全中運，美崙把冠軍寫成一條長線的傳承。</p>
+        </div>
+
+        <div class="metrics-grid items-start">
+          <div class="glass p-5 md:p-6 beam tilt-card" data-reveal>
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <span class="pill"><iconify-icon icon="lucide:shield"></iconify-icon>1994 成軍</span>
+                <h3 class="mt-4 text-3xl md:text-4xl font-semibold text-balance">冠軍不是偶然，而是被日常鍛鍊出來的校園文化</h3>
+              </div>
+              <span class="pill"><iconify-icon icon="lucide:film"></iconify-icon>《奇蹟的夏天》紀事</span>
+            </div>
+            <div class="metric-shell mt-6">
+              <div class="metric-card">
+                <small class="uppercase tracking-[0.2em] text-slate-300">青少年盃冠軍</small>
+                <strong>20</strong>
+                <p class="muted !text-sm">依各組別統計，從早期分齡到近年學校組，累積 20 座冠軍。</p>
+              </div>
+              <div class="metric-card">
+                <small class="uppercase tracking-[0.2em] text-slate-300">聯賽冠軍</small>
+                <strong>8</strong>
+                <p class="muted !text-sm">全國中等學校足球聯賽國男組累積 8 次冠軍，實力長年穩定。</p>
+              </div>
+              <div class="metric-card">
+                <small class="uppercase tracking-[0.2em] text-slate-300">全中運冠軍</small>
+                <strong>3</strong>
+                <p class="muted !text-sm">90 至 92 學年完成三連霸，奠定強隊招牌。</p>
+              </div>
+              <div class="metric-card">
+                <small class="uppercase tracking-[0.2em] text-slate-300">重要冠軍合計</small>
+                <strong>31</strong>
+                <p class="muted !text-sm">青少年盃、聯賽、全中運三大體系加總，構成美崙足球王朝。</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass p-5 md:p-6 beam tilt-card" data-reveal>
+            <div class="flex items-center gap-2 text-sm uppercase tracking-[0.18em] text-slate-300">
+              <iconify-icon icon="lucide:trending-up"></iconify-icon>
+              近年焦點成績
+            </div>
+            <div class="mt-4 space-y-3">
+              <div class="record-item"><span>113 年全國青少年盃國男學校組</span><span>冠軍</span></div>
+              <div class="record-item"><span>112 年全國青少年盃國男學校組</span><span>冠軍</span></div>
+              <div class="record-item"><span>111 年全國青少年盃國男學校組</span><span>冠軍</span></div>
+              <div class="record-item"><span>113 學年全國中等學校足球聯賽國男組</span><span>第一名</span></div>
+              <div class="record-item"><span>114 學年全國中等學校足球聯賽國男組</span><span>第五名</span></div>
+            </div>
+            <div class="mt-6 rounded-[28px] border border-white/8 bg-white/5 p-4">
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-300">傳奇紀事</div>
+              <p class="mt-2 text-lg leading-relaxed">95 學年，金馬獎最佳紀錄片《奇蹟的夏天》開拍，將美崙足球的精神與熱血記錄下來。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="records-grid" id="records-grid"></div>
+      </div>
+    </section>
+
+    <section id="timeline" class="section-wrap">
+      <div class="section-number">04</div>
+      <div class="container-shell">
+        <div class="section-head" data-reveal>
+          <div>
+            <span class="eyebrow"><iconify-icon icon="lucide:route"></iconify-icon>Milestones</span>
+            <h2 class="display-title mt-4 text-4xl md:text-5xl">從 1965 到未來，持續把溫度傳給下一代</h2>
+          </div>
+          <p class="muted">一所學校的力量，來自長時間的堆疊。美崙把歷史、榮耀、課程與照顧，連成一條向前延伸的教育時間線。</p>
+        </div>
+        <div class="timeline-grid" data-stagger>
+          <article class="timeline-card beam tilt-card">
+            <iconify-icon icon="lucide:flag"></iconify-icon>
+            <div class="timeline-year">1965</div>
+            <h3 class="text-2xl font-semibold">創校啟程</h3>
+            <p class="muted">花蓮市第一所縣立國中成立，從此在山海之間開展一段深刻的教育旅程。</p>
+          </article>
+          <article class="timeline-card beam tilt-card">
+            <iconify-icon icon="lucide:school"></iconify-icon>
+            <div class="timeline-year">1968</div>
+            <h3 class="text-2xl font-semibold">正式定名</h3>
+            <p class="muted">九年國民義務教育實施，正式定名為「花蓮縣立美崙國民中學」，沿用至今。</p>
+          </article>
+          <article class="timeline-card beam tilt-card">
+            <iconify-icon icon="lucide:target"></iconify-icon>
+            <div class="timeline-year">1994</div>
+            <h3 class="text-2xl font-semibold">足球成軍</h3>
+            <p class="muted">美崙足球隊成立，從地方球場一路踢進全國冠軍舞台，成為學校經典招牌。</p>
+          </article>
+          <article class="timeline-card beam tilt-card">
+            <iconify-icon icon="lucide:rocket"></iconify-icon>
+            <div class="timeline-year">Future</div>
+            <h3 class="text-2xl font-semibold">在美崙，繼續發光</h3>
+            <p class="muted">把關懷與溫暖種進每個孩子心裡，讓他們在未來的世界裡，帶著品格與勇氣向前走。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-wrap pt-2 pb-16">
+      <div class="container-shell">
+        <div class="footer-panel beam" data-reveal>
+          <div class="grid gap-8 lg:grid-cols-[1.2fr_.8fr] items-end relative z-10">
+            <div>
+              <span class="eyebrow"><iconify-icon icon="lucide:star"></iconify-icon>Magnetic CTA</span>
+              <h2 class="display-title mt-4 text-4xl md:text-6xl">在美崙，讓孩子找到自己，也把未來想得更遠</h2>
+              <p class="hero-copy !max-w-3xl">這不只是一所國中，而是一座把愛、視野、藝術、運動與成長整合成一體的教育場域。從第一眼的校園風景，到每一次真實的學習與比賽，美崙都在說同一件事：每個孩子，都值得被相信。</p>
+            </div>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <a href="#top" class="cta-primary magnetic justify-center">回到頁首<iconify-icon icon="lucide:arrow-up-right"></iconify-icon></a>
+              <a href="#legacy" class="cta-secondary magnetic justify-center">重溫榮耀紀錄<iconify-icon icon="lucide:trophy"></iconify-icon></a>
+            </div>
+          </div>
+          <div class="mt-10 flex flex-col gap-4 border-t border-white/8 pt-5 text-sm text-slate-300 md:flex-row md:items-center md:justify-between relative z-10">
+            <div>
+              <strong class="text-white">花蓮縣立美崙國中</strong> ・ Meilun Junior High School
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span class="pill"><iconify-icon icon="lucide:heart"></iconify-icon>愛不止息</span>
+              <span class="pill"><iconify-icon icon="lucide:globe-2"></iconify-icon>與國際接軌</span>
+              <span class="pill"><iconify-icon icon="lucide:target"></iconify-icon>足球榮耀傳承</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const recordsData = [
+      {
+        title: '全國青少年盃足球錦標賽',
+        icon: 'lucide:medal',
+        summary: '依組別分類累積冠軍 20 座，橫跨學校組、15 歲組、13 歲組與早期分齡。',
+        groups: [
+          {
+            label: '國男學校組｜冠軍 3 座',
+            items: [
+              ['114 年', '八強淘汰'],
+              ['113 年', '冠軍'],
+              ['112 年', '冠軍'],
+              ['111 年', '冠軍']
+            ]
+          },
+          {
+            label: '國男 15 歲組｜冠軍 9 座',
+            items: [
+              ['110 年', '季軍'], ['109 年', '亞軍'], ['108 年', '冠軍'], ['107 年', '亞軍'],
+              ['106 年', '並列第五'], ['105 年', '並列第五'], ['104 年', '冠軍'], ['103 年', '亞軍'],
+              ['102 年', '冠軍'], ['101 年', '冠軍'], ['100 年', '季軍'], ['99 年', '冠軍'],
+              ['98 年', '亞軍'], ['96 年', '冠軍'], ['95 年', '冠軍'], ['94 年', '冠軍'],
+              ['93 年', '季軍'], ['92 年', '亞軍'], ['91 年', '冠軍']
+            ]
+          },
+          {
+            label: '國男 13 歲組｜冠軍 5 座',
+            items: [
+              ['100 年', '冠軍'], ['99 年', '冠軍'], ['98 年', '殿軍'], ['97 年', '冠軍'], ['96 年', '冠軍'], ['95 年', '冠軍']
+            ]
+          },
+          {
+            label: '早期分齡｜冠軍 3 座',
+            items: [
+              ['國男 16 歲組｜90 年', '冠軍'],
+              ['國男 14 歲組｜90 年', '冠軍'],
+              ['國男 14 歲組｜89 年', '冠軍']
+            ]
+          }
+        ]
+      },
+      {
+        title: '全國中等學校足球聯賽國男組',
+        icon: 'lucide:trophy',
+        summary: '冠軍 8 次、亞軍 2 次、季軍 3 次、第四名 3 次、第五名 1 次。',
+        groups: [
+          {
+            label: '冠軍（8 次）',
+            items: [
+              ['113 學年', '第一名'], ['110 學年', '第一名'], ['104 學年', '第一名'], ['102 學年', '第一名'],
+              ['101 學年', '第一名'], ['100 學年', '第一名'], ['97 學年', '第一名'], ['96 學年', '第一名']
+            ]
+          },
+          {
+            label: '其他名次',
+            items: [
+              ['109 學年', '第二名'], ['103 學年', '第二名'], ['111 學年', '第三名'], ['99 學年', '第三名'],
+              ['98 學年', '第三名'], ['112 學年', '第四名'], ['108 學年', '第四名'], ['106 學年', '第四名'], ['114 學年', '第五名']
+            ]
+          }
+        ]
+      },
+      {
+        title: '全中運與重要紀事',
+        icon: 'lucide:flag',
+        summary: '全中運冠軍 3 次，另有紀錄片《奇蹟的夏天》留下美崙足球精神。',
+        groups: [
+          {
+            label: '全中運成績',
+            items: [
+              ['92 學年', '第一名'], ['91 學年', '第一名'], ['90 學年', '第一名'],
+              ['95 學年', '第二名'], ['94 學年', '第二名'], ['93 學年', '第三名']
+            ]
+          },
+          {
+            label: '重要紀事',
+            items: [
+              ['95 學年', '金馬獎最佳紀錄片《奇蹟的夏天》開拍'],
+              ['冠軍總數', '聯賽 8 次 + 全中運 3 次 = 11 次'],
+              ['其他名次統計', '亞軍 4 次・季軍 4 次・第四名 3 次・第五名 1 次']
+            ]
+          }
+        ]
+      }
+    ];
+
+    const recordsGrid = document.getElementById('records-grid');
+    recordsGrid.innerHTML = recordsData.map(card => `
+      <article class="record-card beam tilt-card" data-reveal>
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2 text-sm uppercase tracking-[0.18em] text-slate-300">
+              <iconify-icon icon="${card.icon}"></iconify-icon>
+              Data Archive
+            </div>
+            <h3 class="text-2xl font-semibold mt-3">${card.title}</h3>
+          </div>
+          <span class="pill"><iconify-icon icon="lucide:folder"></iconify-icon>歷程資料</span>
+        </div>
+        <p class="muted mt-3">${card.summary}</p>
+        <div class="mt-4 grid gap-4">
+          ${card.groups.map(group => `
+            <section>
+              <div class="text-sm font-semibold tracking-[0.06em] text-white/90">${group.label}</div>
+              <ul>
+                ${group.items.map(item => `<li class="record-item"><span>${item[0]}</span><span>${item[1]}</span></li>`).join('')}
+              </ul>
+            </section>
+          `).join('')}
+        </div>
+      </article>
+    `).join('');
+
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function initCursor() {
+      if (window.matchMedia('(pointer: coarse)').matches) return;
+      const ring = document.querySelector('.cursor-ring-inner');
+      const dot = document.querySelector('.cursor-dot-inner');
+      let mouseX = window.innerWidth / 2;
+      let mouseY = window.innerHeight / 2;
+      let ringX = mouseX;
+      let ringY = mouseY;
+
+      window.addEventListener('mousemove', e => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        dot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
+      });
+
+      gsap.ticker.add(() => {
+        ringX += (mouseX - ringX) * 0.16;
+        ringY += (mouseY - ringY) * 0.16;
+        ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+      });
+
+      const hoverTargets = document.querySelectorAll('a, button, .tilt-card, .focus-card, .logo-card');
+      hoverTargets.forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          gsap.to(ring, { width: 56, height: 56, duration: 0.28, ease: 'power2.out' });
+          gsap.to(dot, { width: 8, height: 8, duration: 0.28, ease: 'power2.out' });
+        });
+        el.addEventListener('mouseleave', () => {
+          gsap.to(ring, { width: 34, height: 34, duration: 0.28, ease: 'power2.out' });
+          gsap.to(dot, { width: 6, height: 6, duration: 0.28, ease: 'power2.out' });
+        });
+      });
+    }
+
+    function initMagnetic() {
+      document.querySelectorAll('.magnetic').forEach(el => {
+        const strength = 20;
+        el.addEventListener('mousemove', e => {
+          const rect = el.getBoundingClientRect();
+          const x = e.clientX - rect.left - rect.width / 2;
+          const y = e.clientY - rect.top - rect.height / 2;
+          gsap.to(el, {
+            x: (x / rect.width) * strength,
+            y: (y / rect.height) * strength,
+            duration: 0.28,
+            ease: 'power3.out'
+          });
+        });
+        el.addEventListener('mouseleave', () => {
+          gsap.to(el, { x: 0, y: 0, duration: 0.45, ease: 'elastic.out(1, .35)' });
+        });
+      });
+    }
+
+    function initTilt() {
+      if (window.matchMedia('(pointer: coarse)').matches) return;
+      document.querySelectorAll('.tilt-card').forEach(card => {
+        const media = card.querySelector('img');
+        card.addEventListener('mousemove', e => {
+          const rect = card.getBoundingClientRect();
+          const x = (e.clientX - rect.left) / rect.width;
+          const y = (e.clientY - rect.top) / rect.height;
+          const rotateY = (x - 0.5) * 10;
+          const rotateX = (0.5 - y) * 10;
+          gsap.to(card, {
+            rotateX,
+            rotateY,
+            transformPerspective: 1000,
+            duration: 0.35,
+            ease: 'power2.out'
+          });
+          if (media) {
+            gsap.to(media, {
+              x: (x - 0.5) * 16,
+              y: (y - 0.5) * 16,
+              scale: 1.06,
+              duration: 0.55,
+              ease: 'power3.out'
+            });
+          }
+        });
+        card.addEventListener('mouseleave', () => {
+          gsap.to(card, { rotateX: 0, rotateY: 0, duration: 0.5, ease: 'power3.out' });
+          if (media) gsap.to(media, { x: 0, y: 0, scale: 1.02, duration: 0.6, ease: 'power3.out' });
+        });
+      });
+    }
+
+    function initWebGL() {
+      const canvas = document.getElementById('webgl-canvas');
+      if (!canvas || !window.THREE) return;
+
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      renderer.setSize(window.innerWidth, window.innerHeight, false);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+      const uniforms = {
+        u_time: { value: 0 },
+        u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+        u_mouse: { value: new THREE.Vector2(window.innerWidth * 0.5, window.innerHeight * 0.5) }
+      };
+
+      const material = new THREE.ShaderMaterial({
+        transparent: true,
+        uniforms,
+        vertexShader: `
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          precision highp float;
+          varying vec2 vUv;
+          uniform vec2 u_resolution;
+          uniform vec2 u_mouse;
+          uniform float u_time;
+
+          float hash(vec2 p) {
+            return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+          }
+
+          float noise(vec2 p) {
+            vec2 i = floor(p);
+            vec2 f = fract(p);
+            vec2 u = f * f * (3.0 - 2.0 * f);
+            return mix(
+              mix(hash(i + vec2(0.0, 0.0)), hash(i + vec2(1.0, 0.0)), u.x),
+              mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
+              u.y
+            );
+          }
+
+          float fbm(vec2 p) {
+            float value = 0.0;
+            float amplitude = 0.5;
+            for (int i = 0; i < 5; i++) {
+              value += amplitude * noise(p);
+              p *= 2.0;
+              amplitude *= 0.5;
+            }
+            return value;
+          }
+
+          void main() {
+            vec2 uv = (gl_FragCoord.xy * 2.0 - u_resolution.xy) / min(u_resolution.x, u_resolution.y);
+            vec2 muv = (u_mouse * 2.0 - u_resolution.xy) / min(u_resolution.x, u_resolution.y);
+
+            float dist = length(uv - muv * 0.25);
+            vec2 q = vec2(
+              fbm(uv * 1.1 + vec2(0.0, u_time * 0.06)),
+              fbm(uv * 1.1 + vec2(u_time * 0.07, 0.0))
+            );
+
+            float n = fbm(uv * 1.8 + q * 1.8 + vec2(sin(u_time * 0.08), cos(u_time * 0.06)));
+            float swirl = sin((uv.y + n * 0.8) * 7.0 - u_time * 0.7) * 0.5 + 0.5;
+            float glow = smoothstep(1.15, 0.08, dist);
+
+            vec3 base = vec3(0.02, 0.06, 0.09);
+            vec3 jade = vec3(0.18, 0.62, 0.56);
+            vec3 sky = vec3(0.22, 0.38, 0.74);
+            vec3 gold = vec3(0.86, 0.77, 0.42);
+
+            vec3 color = mix(base, jade, smoothstep(0.12, 0.85, n));
+            color = mix(color, sky, smoothstep(0.35, 0.95, swirl) * 0.45);
+            color += gold * glow * 0.22;
+            color += vec3(swirl) * glow * 0.03;
+
+            float vignette = smoothstep(1.65, 0.28, length(uv));
+            color *= 0.72 + vignette * 0.34;
+            gl_FragColor = vec4(color, 0.95);
+          }
+        `
+      });
+
+      const geometry = new THREE.PlaneGeometry(2, 2);
+      const mesh = new THREE.Mesh(geometry, material);
+      scene.add(mesh);
+
+      const mouseTarget = { x: uniforms.u_mouse.value.x, y: uniforms.u_mouse.value.y };
+      window.addEventListener('mousemove', e => {
+        mouseTarget.x = e.clientX;
+        mouseTarget.y = window.innerHeight - e.clientY;
+      });
+
+      function resize() {
+        renderer.setSize(window.innerWidth, window.innerHeight, false);
+        uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight);
+      }
+      window.addEventListener('resize', resize);
+
+      function render(t) {
+        uniforms.u_time.value = t * 0.001;
+        uniforms.u_mouse.value.x += (mouseTarget.x - uniforms.u_mouse.value.x) * 0.06;
+        uniforms.u_mouse.value.y += (mouseTarget.y - uniforms.u_mouse.value.y) * 0.06;
+        renderer.render(scene, camera);
+        requestAnimationFrame(render);
+      }
+      requestAnimationFrame(render);
+    }
+
+    function initAnimations() {
+      if (!window.gsap) return;
+      gsap.registerPlugin(ScrollTrigger);
+
+      if (!prefersReduced) {
+        gsap.to('.liquid-blob.-a', { xPercent: 18, yPercent: -10, scale: 1.12, duration: 8, ease: 'sine.inOut', repeat: -1, yoyo: true });
+        gsap.to('.liquid-blob.-b', { xPercent: -16, yPercent: 8, scale: .9, duration: 7, ease: 'sine.inOut', repeat: -1, yoyo: true });
+        gsap.to('.liquid-blob.-c', { xPercent: 10, yPercent: -14, scale: 1.08, duration: 9, ease: 'sine.inOut', repeat: -1, yoyo: true });
+
+        gsap.set('.hero-slice', { yPercent: -110, scale: 1.08 });
+        gsap.to('.hero-slice', {
+          yPercent: 0,
+          duration: 1.35,
+          ease: 'expo.out',
+          stagger: 0.08
+        });
+
+        gsap.fromTo('.hero-title .line span',
+          { yPercent: 130, opacity: 0 },
+          { yPercent: 0, opacity: 1, duration: 1.15, ease: 'expo.out', stagger: 0.12, delay: .35 }
+        );
+        gsap.to(['.hero-copy', '.hero-chip', '.reveal-up'], {
+          opacity: 1,
+          y: 0,
+          duration: .9,
+          ease: 'power3.out',
+          stagger: .08,
+          delay: .62
+        });
+
+        gsap.fromTo('.hero-panel',
+          { y: 42, opacity: 0 },
+          { y: 0, opacity: 1, duration: 1.1, ease: 'power4.out', delay: .72 }
+        );
+      } else {
+        document.querySelectorAll('.hero-title .line span, .hero-copy, .hero-chip, .reveal-up').forEach(el => {
+          el.style.opacity = 1;
+          el.style.transform = 'none';
+        });
+      }
+
+      gsap.utils.toArray('[data-reveal]').forEach(el => {
+        gsap.fromTo(el,
+          { y: 28, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: .9,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 85%'
+            }
+          }
+        );
+      });
+
+      gsap.utils.toArray('[data-stagger]').forEach(group => {
+        gsap.fromTo(group.children,
+          { y: 24, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: .9,
+            ease: 'power3.out',
+            stagger: .08,
+            scrollTrigger: {
+              trigger: group,
+              start: 'top 82%'
+            }
+          }
+        );
+      });
+
+      gsap.utils.toArray('[data-depth]').forEach(el => {
+        const depth = parseFloat(el.dataset.depth || '0.12');
+        gsap.to(el, {
+          yPercent: depth * -100,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: el,
+            scrub: true,
+            start: 'top bottom',
+            end: 'bottom top'
+          }
+        });
+      });
+
+      gsap.utils.toArray('.section-wrap').forEach(section => {
+        const deco = section.querySelector('.section-number');
+        if (!deco) return;
+        gsap.fromTo(deco,
+          { y: 0, opacity: .12 },
+          {
+            y: 80,
+            opacity: .26,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: section,
+              scrub: true,
+              start: 'top bottom',
+              end: 'bottom top'
+            }
+          }
+        );
+      });
+
+      gsap.to('.hero-slices', {
+        yPercent: 10,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '#top',
+          scrub: true,
+          start: 'top top',
+          end: 'bottom top'
+        }
+      });
+
+      gsap.to('.hero-heading-wrap', {
+        yPercent: -12,
+        opacity: 0.2,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '#top',
+          scrub: true,
+          start: 'top top',
+          end: 'bottom top'
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initCursor();
+      initMagnetic();
+      initTilt();
+      initWebGL();
+      initAnimations();
+    });
+  </script>
+</body>
+</html>
