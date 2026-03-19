@@ -1,0 +1,1776 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="description" content="完治加啡｜深夜療癒系精品咖啡 Landing Page，結合 WebGL 流體背景、四欄位切片轉場與十款故事咖啡處方。" />
+  <title>完治加啡｜Cure by Cup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Serif+TC:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            obsidian: '#05080b',
+            pitch: '#0a0f12',
+            ivory: '#f5efe7',
+            mist: '#d8d1c5',
+            ember: '#d2a35a',
+            bronze: '#9f7140',
+            tealish: '#1a3538'
+          },
+          boxShadow: {
+            halo: '0 32px 90px rgba(0,0,0,0.45)',
+            soft: '0 22px 50px rgba(0,0,0,0.22)'
+          }
+        }
+      }
+    }
+  </script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/iconify-icon@2.1.0/dist/iconify-icon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
+  <style>
+    :root {
+      --bg: #05080b;
+      --panel: rgba(255, 255, 255, 0.06);
+      --panel-strong: rgba(255, 255, 255, 0.1);
+      --stroke: rgba(255, 255, 255, 0.1);
+      --stroke-strong: rgba(255, 255, 255, 0.18);
+      --text: #f5efe7;
+      --muted: rgba(245, 239, 231, 0.72);
+      --muted-soft: rgba(245, 239, 231, 0.5);
+      --gold: #d2a35a;
+      --gold-soft: rgba(210, 163, 90, 0.28);
+      --teal: #173235;
+      --radius-sm: 16px;
+      --radius-md: 22px;
+      --radius-lg: 32px;
+      --radius-xl: 40px;
+      --container: min(1200px, calc(100vw - 2rem));
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg);
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 20%, rgba(210, 163, 90, 0.08), transparent 30%),
+        radial-gradient(circle at 90% 15%, rgba(31, 83, 88, 0.2), transparent 28%),
+        radial-gradient(circle at 50% 80%, rgba(210, 163, 90, 0.08), transparent 35%),
+        var(--bg);
+      font-family: 'Inter', system-ui, sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+      cursor: none;
+    }
+
+    body.is-touch {
+      cursor: auto;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08), transparent 38%),
+        linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(5, 8, 11, 0.45) 100%);
+      z-index: 1;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    ::selection {
+      background: rgba(210, 163, 90, 0.28);
+      color: #fff;
+    }
+
+    #webgl-wrap {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+      opacity: 0.96;
+    }
+
+    #webgl-wrap canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+      filter: saturate(1.08) contrast(1.02);
+    }
+
+    .noise-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0.075;
+      mix-blend-mode: soft-light;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    }
+
+    .reference-lines {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0.55;
+    }
+
+    .reference-lines span {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.08) 8%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.05) 92%, transparent 100%);
+    }
+
+    .reference-lines span:nth-child(1) { left: 12.5%; }
+    .reference-lines span:nth-child(2) { left: 37.5%; }
+    .reference-lines span:nth-child(3) { left: 62.5%; }
+    .reference-lines span:nth-child(4) { left: 87.5%; }
+
+    .main-shell {
+      position: relative;
+      z-index: 5;
+    }
+
+    .container-shell {
+      width: var(--container);
+      margin-inline: auto;
+    }
+
+    .glass-panel {
+      position: relative;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03));
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(18px) saturate(150%);
+      -webkit-backdrop-filter: blur(18px) saturate(150%);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.32);
+    }
+
+    .section-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      box-shadow: 0 22px 50px rgba(0,0,0,0.22);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .section-card::before,
+    .tilt-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(circle at var(--px, 50%) var(--py, 50%), rgba(255,255,255,0.18), transparent 40%);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      pointer-events: none;
+    }
+
+    .section-card:hover::before,
+    .tilt-card:hover::before {
+      opacity: 1;
+    }
+
+    .hero-section {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: stretch;
+      overflow: hidden;
+    }
+
+    .hero-backdrop {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(5, 8, 11, 0.35) 0%, rgba(5, 8, 11, 0.2) 36%, rgba(5, 8, 11, 0.72) 100%),
+        radial-gradient(circle at 75% 25%, rgba(210,163,90,0.14), transparent 22%),
+        radial-gradient(circle at 20% 20%, rgba(19,50,53,0.2), transparent 24%);
+      z-index: 0;
+    }
+
+    .slice-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 25;
+      display: flex;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .slice {
+      flex: 1;
+      position: relative;
+      background-image:
+        linear-gradient(180deg, rgba(5, 8, 11, 0.15), rgba(5, 8, 11, 0.6)),
+        url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1800&q=80');
+      background-size: 400% 100%, cover;
+      background-repeat: no-repeat;
+      border-right: 1px solid rgba(255,255,255,0.09);
+      transform: translateY(-105%);
+      will-change: transform;
+    }
+
+    .slice::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), transparent 35%, rgba(0,0,0,0.12) 100%);
+      mix-blend-mode: screen;
+      opacity: 0.9;
+    }
+
+    .slice:nth-child(1) { background-position: 0% 50%, center; }
+    .slice:nth-child(2) { background-position: 33.33% 50%, center; }
+    .slice:nth-child(3) { background-position: 66.66% 50%, center; }
+    .slice:nth-child(4) { background-position: 100% 50%, center; border-right: none; }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
+      font-size: 0.72rem;
+      color: rgba(245,239,231,0.62);
+    }
+
+    .eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 3rem;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.1), rgba(210,163,90,0.9));
+    }
+
+    .hero-title {
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 900;
+      line-height: 0.96;
+      letter-spacing: -0.04em;
+      text-wrap: balance;
+      text-shadow: 0 16px 40px rgba(0,0,0,0.22);
+    }
+
+    .hero-title .line {
+      display: block;
+      overflow: hidden;
+    }
+
+    .hero-title .line span {
+      display: inline-block;
+    }
+
+    .hero-number,
+    .section-number {
+      position: absolute;
+      font-size: clamp(5rem, 18vw, 13rem);
+      line-height: 0.8;
+      font-weight: 900;
+      letter-spacing: -0.08em;
+      color: rgba(255,255,255,0.04);
+      user-select: none;
+      pointer-events: none;
+      font-family: 'Inter', sans-serif;
+      z-index: 0;
+    }
+
+    .hero-number {
+      top: clamp(4rem, 11vw, 7rem);
+      left: min(3vw, 2rem);
+    }
+
+    .section-number {
+      top: -1.2rem;
+      right: -0.8rem;
+    }
+
+    .hero-kicker {
+      color: rgba(245, 239, 231, 0.88);
+      text-wrap: balance;
+    }
+
+    .hero-copy {
+      color: var(--muted);
+      text-wrap: pretty;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.9rem;
+      align-items: center;
+    }
+
+    .magnetic {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.7rem;
+      padding: 0.95rem 1.35rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      transition: border-color 0.28s ease, background-color 0.28s ease, color 0.28s ease, box-shadow 0.28s ease;
+      will-change: transform;
+      isolation: isolate;
+      transform: translateZ(0);
+    }
+
+    .magnetic.primary {
+      background: linear-gradient(135deg, rgba(210,163,90,0.95), rgba(159,113,64,0.94));
+      color: #120f0b;
+      box-shadow: 0 16px 34px rgba(210,163,90,0.22);
+      border-color: rgba(255,255,255,0.18);
+    }
+
+    .magnetic.secondary {
+      background: rgba(255,255,255,0.02);
+      color: rgba(245,239,231,0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .magnetic:hover {
+      border-color: rgba(255,255,255,0.22);
+      box-shadow: 0 16px 30px rgba(0,0,0,0.25);
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.85rem;
+    }
+
+    .meta-pill {
+      border-radius: var(--radius-md);
+      padding: 1rem 1rem 0.95rem;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+      border: 1px solid rgba(255,255,255,0.08);
+      min-height: 104px;
+    }
+
+    .meta-pill strong {
+      display: block;
+      font-size: 0.82rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.48);
+      margin-bottom: 0.55rem;
+    }
+
+    .meta-pill span {
+      display: block;
+      color: rgba(245,239,231,0.92);
+      font-size: 1rem;
+      line-height: 1.4;
+      text-wrap: pretty;
+    }
+
+    .hero-scroll {
+      position: absolute;
+      left: 50%;
+      bottom: 1.4rem;
+      transform: translateX(-50%);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .hero-scroll::after {
+      content: '';
+      width: 1px;
+      height: 44px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.6), transparent);
+      display: inline-block;
+    }
+
+    .floating-card {
+      border-radius: var(--radius-xl);
+      padding: 1.1rem;
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+    }
+
+    .floating-card .image-wrap {
+      overflow: hidden;
+      border-radius: calc(var(--radius-xl) - 10px);
+      aspect-ratio: 4 / 5;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+
+    .floating-card .image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.04);
+      transition: transform 0.8s ease;
+    }
+
+    .floating-card:hover .image-wrap img {
+      transform: scale(1.1);
+    }
+
+    .floating-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.14), transparent 45%, rgba(0,0,0,0.18) 100%);
+      pointer-events: none;
+      border-radius: inherit;
+    }
+
+    .small-kicker {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: center;
+      color: rgba(245,239,231,0.72);
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+    }
+
+    .highlight-dot {
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(210,163,90,1), rgba(245,239,231,0.6));
+      box-shadow: 0 0 0 10px rgba(210,163,90,0.08);
+      flex: 0 0 auto;
+    }
+
+    .liquid-divider {
+      position: relative;
+      display: block;
+      width: 100%;
+      height: clamp(5rem, 10vw, 9rem);
+      margin-top: -1px;
+      z-index: 4;
+      overflow: hidden;
+    }
+
+    .liquid-divider svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .liquid-divider path {
+      fill: rgba(255,255,255,0.04);
+      opacity: 0.95;
+      filter: drop-shadow(0 -10px 30px rgba(0,0,0,0.2));
+    }
+
+    .section-shell {
+      position: relative;
+      padding-block: clamp(4.5rem, 10vw, 7rem);
+    }
+
+    .section-head {
+      position: relative;
+      z-index: 2;
+      margin-bottom: clamp(2rem, 4vw, 3rem);
+    }
+
+    .section-title {
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      line-height: 1.04;
+      text-wrap: balance;
+    }
+
+    .section-desc {
+      color: rgba(245,239,231,0.72);
+      text-wrap: pretty;
+    }
+
+    .value-card,
+    .story-card,
+    .testimonial-card,
+    .partner-card,
+    .offer-card {
+      position: relative;
+      z-index: 1;
+    }
+
+    .value-card iconify-icon,
+    .offer-card iconify-icon {
+      font-size: 1.8rem;
+      color: rgba(210, 163, 90, 0.98);
+    }
+
+    .value-card h3,
+    .offer-card h3 {
+      font-size: clamp(1.15rem, 2vw, 1.35rem);
+      line-height: 1.2;
+      margin: 0;
+    }
+
+    .value-card p,
+    .offer-card p,
+    .story-card p,
+    .testimonial-card p {
+      color: rgba(245,239,231,0.72);
+      line-height: 1.75;
+      margin: 0;
+      text-wrap: pretty;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .tilt-card {
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .tilt-card:hover {
+      border-color: rgba(255,255,255,0.16);
+      box-shadow: 0 28px 80px rgba(0,0,0,0.38);
+    }
+
+    .tilt-card > * {
+      position: relative;
+      z-index: 1;
+      transform: translateZ(28px);
+    }
+
+    .menu-image {
+      overflow: hidden;
+      position: relative;
+      border-radius: calc(var(--radius-lg) - 10px);
+      background: rgba(255,255,255,0.04);
+      isolation: isolate;
+    }
+
+    .menu-image::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(5,8,11,0.06) 55%, rgba(5,8,11,0.28) 100%);
+      pointer-events: none;
+    }
+
+    .menu-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.9s ease;
+    }
+
+    .tilt-card:hover .menu-image img {
+      transform: scale(1.08);
+    }
+
+    .menu-price {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.6rem 0.85rem;
+      min-width: 88px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: rgba(245,239,231,0.96);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .menu-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .menu-tags span {
+      border-radius: 999px;
+      padding: 0.45rem 0.7rem;
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: rgba(245,239,231,0.64);
+    }
+
+    .partner-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.9rem;
+    }
+
+    .partner-card {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 110px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: rgba(255,255,255,0.68);
+      transition: transform 0.35s ease, border-color 0.35s ease;
+    }
+
+    .partner-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255,255,255,0.16);
+    }
+
+    .partner-card iconify-icon {
+      font-size: clamp(2rem, 5vw, 2.8rem);
+    }
+
+    .testimonial-card {
+      padding: 1.2rem;
+      border-radius: var(--radius-lg);
+    }
+
+    .testimonial-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .testimonial-meta img {
+      width: 64px;
+      height: 64px;
+      border-radius: 999px;
+      object-fit: cover;
+      border: 1px solid rgba(255,255,255,0.16);
+    }
+
+    .testimonial-name {
+      font-weight: 700;
+      font-size: 1rem;
+      color: rgba(245,239,231,0.95);
+    }
+
+    .testimonial-role {
+      color: rgba(245,239,231,0.54);
+      font-size: 0.84rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-top: 0.18rem;
+    }
+
+    .offer-grid {
+      display: grid;
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .cta-banner {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-xl);
+      padding: clamp(1.4rem, 3vw, 1.8rem);
+      min-height: 390px;
+    }
+
+    .cta-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(5,8,11,0.18), rgba(5,8,11,0.72)),
+        url('https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&w=1800&q=80') center/cover no-repeat;
+      transform: scale(1.04);
+      filter: saturate(0.92) contrast(1.05);
+    }
+
+    .cta-banner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 25% 18%, rgba(210,163,90,0.22), transparent 30%),
+        linear-gradient(120deg, rgba(255,255,255,0.08), transparent 40%);
+      pointer-events: none;
+    }
+
+    .cta-banner > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-line {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 20%, rgba(255,255,255,0.14) 50%, rgba(255,255,255,0.08) 80%, transparent 100%);
+    }
+
+    .cursor-ring,
+    .cursor-dot {
+      position: fixed;
+      top: 0;
+      left: 0;
+      transform: translate(-50%, -50%);
+      border-radius: 999px;
+      pointer-events: none;
+      z-index: 50;
+      mix-blend-mode: difference;
+      opacity: 0;
+      transition: opacity 0.25s ease, width 0.25s ease, height 0.25s ease, border-color 0.25s ease;
+    }
+
+    .cursor-dot {
+      width: 8px;
+      height: 8px;
+      background: rgba(255,255,255,0.94);
+    }
+
+    .cursor-ring {
+      width: 38px;
+      height: 38px;
+      border: 1px solid rgba(255,255,255,0.85);
+      background: transparent;
+    }
+
+    body.cursor-visible .cursor-ring,
+    body.cursor-visible .cursor-dot {
+      opacity: 1;
+    }
+
+    body.cursor-active .cursor-ring {
+      width: 70px;
+      height: 70px;
+      border-color: rgba(255,255,255,0.98);
+    }
+
+    [data-reveal] {
+      opacity: 0;
+      transform: translate3d(0, 48px, 0);
+    }
+
+    @media (min-width: 768px) {
+      .menu-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .offer-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .partner-row {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .menu-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .menu-grid .featured-card {
+        grid-column: span 2;
+      }
+
+      .menu-grid .featured-card .menu-inner {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+        gap: 1.2rem;
+        align-items: stretch;
+      }
+
+      .menu-grid .featured-card .menu-image {
+        height: 100%;
+        min-height: 360px;
+      }
+    }
+
+    @media (max-width: 1023px) {
+      .meta-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .floating-card {
+        max-width: 560px;
+        margin-inline: auto;
+      }
+    }
+
+    @media (max-width: 767px) {
+      body {
+        cursor: auto;
+      }
+
+      .section-card,
+      .floating-card,
+      .cta-banner {
+        border-radius: 24px;
+      }
+
+      .slice {
+        background-size: cover;
+      }
+
+      .reference-lines {
+        opacity: 0.22;
+      }
+
+      .reference-lines span:nth-child(1) { left: 25%; }
+      .reference-lines span:nth-child(2) { left: 50%; }
+      .reference-lines span:nth-child(3) { left: 75%; }
+      .reference-lines span:nth-child(4) { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+
+      [data-reveal] {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="webgl-wrap" aria-hidden="true"></div>
+  <div class="noise-layer" aria-hidden="true"></div>
+  <div class="reference-lines" aria-hidden="true">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  <div class="cursor-ring" aria-hidden="true"></div>
+  <div class="cursor-dot" aria-hidden="true"></div>
+
+  <div class="main-shell">
+    <header class="fixed inset-x-0 top-0 z-40">
+      <div class="container-shell px-4 sm:px-6 pt-4">
+        <div class="glass-panel rounded-[22px] px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+          <a href="#top" class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-full border border-white/10 bg-white/5 grid place-items-center text-amber-200 text-lg">完</div>
+            <div class="min-w-0">
+              <div class="text-[0.72rem] tracking-[0.36em] uppercase text-white/45">Cure by Cup</div>
+              <div class="font-semibold text-sm sm:text-base truncate">完治加啡</div>
+            </div>
+          </a>
+          <nav class="hidden md:flex items-center gap-6 text-sm text-white/65 tracking-[0.2em] uppercase">
+            <a href="#values" class="hover:text-white transition-colors">Brand</a>
+            <a href="#menu" class="hover:text-white transition-colors">Menu</a>
+            <a href="#story" class="hover:text-white transition-colors">Story</a>
+            <a href="#reserve" class="hover:text-white transition-colors">Reserve</a>
+          </nav>
+          <a href="#reserve" class="magnetic secondary text-sm shrink-0">
+            <iconify-icon icon="lucide:coffee"></iconify-icon>
+            預約今晚療程
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero-section" id="hero">
+        <div class="hero-backdrop"></div>
+        <div class="slice-overlay" aria-hidden="true">
+          <div class="slice"></div>
+          <div class="slice"></div>
+          <div class="slice"></div>
+          <div class="slice"></div>
+        </div>
+        <div class="hero-number">00</div>
+        <div class="container-shell px-4 sm:px-6 pt-32 pb-16 lg:pt-36 lg:pb-14 relative z-10 flex items-end">
+          <div class="grid lg:grid-cols-12 gap-8 lg:gap-10 items-end w-full">
+            <div class="lg:col-span-7 space-y-7 lg:space-y-8">
+              <div data-depth="1.5">
+                <div class="eyebrow hero-panel hero-kicker">Night ritual for restless minds</div>
+              </div>
+              <div class="space-y-5" data-depth="1.2">
+                <h1 class="hero-title text-[clamp(3.2rem,9vw,7.3rem)] hero-panel">
+                  <span class="line"><span>完治加啡</span></span>
+                  <span class="line text-[0.42em] tracking-[0.06em] font-bold text-white/72"><span>把咖啡做成一場會讓人慢慢好起來的夜間療程</span></span>
+                </h1>
+                <p class="hero-copy text-base sm:text-lg lg:text-[1.15rem] max-w-2xl hero-panel">
+                  給夜班工作者、創作者與總在深夜重整情緒的人。完治加啡以精品豆的精準焙度、電影級空間感與十杯情緒處方，讓城市裡最緊的神經先鬆一口氣，再重新發亮。
+                </p>
+              </div>
+              <div class="cta-row hero-panel" data-depth="0.9">
+                <a href="#menu" class="magnetic primary text-sm sm:text-base">
+                  <iconify-icon icon="lucide:bookmark"></iconify-icon>
+                  查看十款完治處方
+                </a>
+                <a href="#values" class="magnetic secondary text-sm sm:text-base">
+                  <iconify-icon icon="lucide:play-circle"></iconify-icon>
+                  先讀品牌診斷
+                </a>
+              </div>
+              <div class="meta-grid hero-panel max-w-3xl" data-depth="0.7">
+                <div class="meta-pill">
+                  <strong>Core Value 01</strong>
+                  <span>精準焙度，不以刺激取勝，而以恢復秩序的平衡取勝。</span>
+                </div>
+                <div class="meta-pill">
+                  <strong>Core Value 02</strong>
+                  <span>每一杯都有情緒故事，讓風味像一句剛好的安慰。</span>
+                </div>
+                <div class="meta-pill">
+                  <strong>Core Value 03</strong>
+                  <span>夜色、噪點、慢光與咖啡，組成城市最柔韌的儀式感。</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="lg:col-span-5">
+              <div class="glass-panel floating-card hero-panel tilt-card" data-depth="1.7">
+                <div class="small-kicker mb-4">
+                  <span class="inline-flex items-center gap-2"><span class="highlight-dot"></span> Tonight Prescription</span>
+                  <span>18:00 — 02:00</span>
+                </div>
+                <div class="image-wrap">
+                  <img src="https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=1200&q=80" alt="完治加啡主視覺咖啡杯" loading="eager" decoding="async" />
+                </div>
+                <div class="space-y-4">
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <div class="text-xs tracking-[0.28em] uppercase text-white/45 mb-1">Signature Mood</div>
+                      <div class="font-semibold text-xl text-white/95">深夜先被治癒，再重新上場</div>
+                    </div>
+                    <div class="menu-price">NT$ 210+</div>
+                  </div>
+                  <p class="text-white/72 leading-7 text-sm sm:text-[0.95rem]">
+                    本季主打以黑糖、可可、花香與柑橘層層堆疊，像把工作留下的稜角慢慢磨鈍，再把專注和溫度重新倒回你的手心。
+                  </p>
+                  <div class="grid grid-cols-3 gap-3 text-center">
+                    <div class="rounded-[20px] border border-white/8 bg-white/5 px-3 py-3">
+                      <div class="text-[0.68rem] uppercase tracking-[0.2em] text-white/45">Roast</div>
+                      <div class="mt-1 text-sm font-medium text-white/90">中深焙</div>
+                    </div>
+                    <div class="rounded-[20px] border border-white/8 bg-white/5 px-3 py-3">
+                      <div class="text-[0.68rem] uppercase tracking-[0.2em] text-white/45">Mood</div>
+                      <div class="mt-1 text-sm font-medium text-white/90">降噪</div>
+                    </div>
+                    <div class="rounded-[20px] border border-white/8 bg-white/5 px-3 py-3">
+                      <div class="text-[0.68rem] uppercase tracking-[0.2em] text-white/45">Finish</div>
+                      <div class="mt-1 text-sm font-medium text-white/90">回甘</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-scroll" aria-hidden="true">Scroll to recover</div>
+      </section>
+
+      <div class="liquid-divider" aria-hidden="true">
+        <svg viewBox="0 0 1440 220" preserveAspectRatio="none">
+          <path class="liquid-path" d=""></path>
+        </svg>
+      </div>
+
+      <section class="section-shell" id="values">
+        <div class="container-shell px-4 sm:px-6">
+          <div class="grid lg:grid-cols-12 gap-7 lg:gap-10 items-start">
+            <div class="lg:col-span-5 section-head">
+              <div class="eyebrow mb-4">01 / Brand Prescription</div>
+              <h2 class="section-title text-[clamp(2.3rem,5vw,4.4rem)] mb-5" data-reveal>
+                品牌不是賣咖啡，<br class="hidden sm:block" />而是替失序的夜晚重排節奏。
+              </h2>
+              <p class="section-desc text-base sm:text-lg max-w-xl" data-reveal>
+                我們把「完治」定義成一種能被喝下去的狀態：不是瞬間亢奮，而是把煩躁、空轉與疲倦慢慢收束，讓風味像醫囑一樣準確，讓空間像電影一樣安定。
+              </p>
+            </div>
+            <div class="lg:col-span-7 grid md:grid-cols-3 gap-4 lg:gap-5 relative">
+              <div class="section-number">01</div>
+              <article class="section-card value-card p-5 sm:p-6" data-reveal>
+                <div class="flex items-start justify-between gap-4 mb-5">
+                  <iconify-icon icon="lucide:coffee"></iconify-icon>
+                  <div class="text-[0.72rem] tracking-[0.28em] uppercase text-white/40">Roast for Recovery</div>
+                </div>
+                <h3 class="mb-3">精準焙度</h3>
+                <p>從生豆選擇到萃取秒數，都以「好入口、好回甘、好安定」為準，不追求炫技，只追求每一次入口都像有人替你把雜訊關小一格。</p>
+              </article>
+              <article class="section-card value-card p-5 sm:p-6" data-reveal>
+                <div class="flex items-start justify-between gap-4 mb-5">
+                  <iconify-icon icon="lucide:moon-star"></iconify-icon>
+                  <div class="text-[0.72rem] tracking-[0.28em] uppercase text-white/40">Mood as Menu</div>
+                </div>
+                <h3 class="mb-3">情緒型風味</h3>
+                <p>每個品項都有自己的小故事，因為我們相信你不是在點一杯咖啡，而是在選擇今晚想被怎麼安撫、提起，或溫柔地推回自己。</p>
+              </article>
+              <article class="section-card value-card p-5 sm:p-6" data-reveal>
+                <div class="flex items-start justify-between gap-4 mb-5">
+                  <iconify-icon icon="lucide:disc-3"></iconify-icon>
+                  <div class="text-[0.72rem] tracking-[0.28em] uppercase text-white/40">Night Ritual Design</div>
+                </div>
+                <h3 class="mb-3">夜色儀式感</h3>
+                <p>從低照度光影、細緻噪點、慢速視差到杯緣熱霧，我們把每個細節都做成讓身體願意停下來的理由，讓夜晚終於不只是疲憊的延長。</p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-shell pt-0" aria-labelledby="culture-title">
+        <div class="container-shell px-4 sm:px-6">
+          <div class="section-card p-5 sm:p-6 lg:p-8" data-reveal>
+            <div class="grid lg:grid-cols-12 gap-7 lg:gap-10 items-center">
+              <div class="lg:col-span-4">
+                <div class="eyebrow mb-4">Global Coffee Coordinates</div>
+                <h2 id="culture-title" class="section-title text-[clamp(1.9rem,4vw,3rem)] mb-4">世界咖啡文化的靈感座標</h2>
+                <p class="section-desc text-sm sm:text-base">我們從全球經典品牌的節奏感、識別感與杯中記憶汲取靈感，但把語言收斂成更安靜、更深夜，也更屬於完治加啡的版本。</p>
+              </div>
+              <div class="lg:col-span-8 partner-row">
+                <div class="partner-card" aria-label="Starbucks 靈感標誌"><iconify-icon icon="simple-icons:starbucks"></iconify-icon></div>
+                <div class="partner-card" aria-label="Nespresso 靈感標誌"><iconify-icon icon="simple-icons:nespresso"></iconify-icon></div>
+                <div class="partner-card" aria-label="Lavazza 靈感標誌"><iconify-icon icon="simple-icons:lavazza"></iconify-icon></div>
+                <div class="partner-card" aria-label="Illy 靈感標誌"><iconify-icon icon="simple-icons:illy"></iconify-icon></div>
+                <div class="partner-card" aria-label="Dunkin 靈感標誌"><iconify-icon icon="simple-icons:dunkin"></iconify-icon></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="liquid-divider" aria-hidden="true">
+        <svg viewBox="0 0 1440 220" preserveAspectRatio="none">
+          <path class="liquid-path" d=""></path>
+        </svg>
+      </div>
+
+      <section class="section-shell" id="menu">
+        <div class="container-shell px-4 sm:px-6">
+          <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5 section-head">
+            <div class="max-w-3xl">
+              <div class="eyebrow mb-4">02 / Ten Curative Drinks</div>
+              <h2 class="section-title text-[clamp(2.3rem,5vw,4.2rem)] mb-4" data-reveal>
+                十款完治處方，每一杯都為不同的夜晚而寫。
+              </h2>
+              <p class="section-desc text-base sm:text-lg" data-reveal>
+                價格設計從日常可進入到儀式感滿點的深夜手沖，每一杯都保留故事、香氣曲線與恰好的餘韻，讓你在挑選風味時，也順便挑選今晚想成為的狀態。
+              </p>
+            </div>
+            <div class="section-card px-5 py-4 rounded-[22px] w-full lg:w-auto" data-reveal>
+              <div class="text-[0.72rem] uppercase tracking-[0.32em] text-white/45 mb-1">Open Prescription</div>
+              <div class="text-xl font-semibold text-white/92">十杯限定 · 每晚 18:00–02:00</div>
+            </div>
+          </div>
+          <div id="menu-grid" class="menu-grid"></div>
+        </div>
+      </section>
+
+      <section class="section-shell pt-0" id="story">
+        <div class="container-shell px-4 sm:px-6">
+          <div class="grid lg:grid-cols-12 gap-7 lg:gap-10 items-start">
+            <div class="lg:col-span-6 space-y-4">
+              <div class="eyebrow">03 / Late Shift Story</div>
+              <h2 class="section-title text-[clamp(2.2rem,4.8vw,4rem)]" data-reveal>
+                夜班的人，不一定需要被鼓勵；很多時候，只需要被好好接住。
+              </h2>
+              <p class="section-desc text-base sm:text-lg max-w-2xl" data-reveal>
+                完治加啡誕生於一個很實際的念頭：那些在午夜還得繼續輸出的人，值得一間不把咖啡做得太吵、卻把細節做得很深的店。於是，我們把每個杯型都像電影腳本一樣排過節奏，讓第一口、第二口和最後的回甘，都有自己的角色。
+              </p>
+            </div>
+            <div class="lg:col-span-6 cta-banner glass-panel" data-reveal>
+              <div class="grid h-full content-between gap-6">
+                <div class="space-y-4 max-w-xl">
+                  <div class="inline-flex items-center gap-2 rounded-full px-3 py-2 border border-white/12 bg-white/5 text-[0.72rem] tracking-[0.28em] uppercase text-white/58">
+                    <span class="highlight-dot"></span>
+                    Midnight Recovery Protocol
+                  </div>
+                  <h3 class="font-semibold text-[clamp(1.8rem,3vw,3rem)] leading-tight tracking-[-0.03em] text-white/95">
+                    今晚，先別逼自己更快；
+                    <br class="hidden sm:block" />先喝一杯，讓情緒回到能呼吸的位置。
+                  </h3>
+                </div>
+                <div class="grid sm:grid-cols-3 gap-3 max-w-3xl">
+                  <div class="rounded-[22px] border border-white/10 bg-black/20 px-4 py-4 backdrop-blur-sm">
+                    <div class="text-[0.68rem] uppercase tracking-[0.2em] text-white/45">Recovery</div>
+                    <div class="mt-2 font-medium text-white/94">用風味安撫節奏</div>
+                  </div>
+                  <div class="rounded-[22px] border border-white/10 bg-black/20 px-4 py-4 backdrop-blur-sm">
+                    <div class="text-[0.68rem] uppercase tracking-[0.2em] text-white/45">Focus</div>
+                    <div class="mt-2 font-medium text-white/94">保留清醒，不過度驚擾</div>
+                  </div>
+                  <div class="rounded-[22px] border border-white/10 bg-black/20 px-4 py-4 backdrop-blur-sm">
+                    <div class="text-[0.68rem] uppercase tracking-[0.2em] text-white/45">Aftertaste</div>
+                    <div class="mt-2 font-medium text-white/94">讓回甘替代焦躁</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-shell pt-0" aria-labelledby="testimonial-title">
+        <div class="container-shell px-4 sm:px-6">
+          <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5 section-head">
+            <div>
+              <div class="eyebrow mb-4">Voices from the Night</div>
+              <h2 id="testimonial-title" class="section-title text-[clamp(2rem,4.5vw,3.6rem)]" data-reveal>
+                被城市壓得太緊的人，怎麼形容完治加啡。
+              </h2>
+            </div>
+            <p class="section-desc max-w-2xl text-base sm:text-lg" data-reveal>
+              我們最常收到的回饋不是「好喝」，而是「今天終於有一杯像是在理解我」。這大概就是完治加啡存在的理由。
+            </p>
+          </div>
+          <div class="grid md:grid-cols-3 gap-4 lg:gap-5">
+            <article class="section-card testimonial-card" data-reveal>
+              <div class="testimonial-meta">
+                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80" alt="安禾頭像" loading="lazy" decoding="async" />
+                <div>
+                  <div class="testimonial-name">安禾</div>
+                  <div class="testimonial-role">品牌設計師</div>
+                </div>
+              </div>
+              <p>「我常常熬到凌晨才把提案做完，完治加啡很像有人在你肩膀拍一下，說先別急，這杯會陪你把最後一段撐完。」</p>
+            </article>
+            <article class="section-card testimonial-card" data-reveal>
+              <div class="testimonial-meta">
+                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" alt="宇森頭像" loading="lazy" decoding="async" />
+                <div>
+                  <div class="testimonial-name">宇森</div>
+                  <div class="testimonial-role">後期剪接師</div>
+                </div>
+              </div>
+              <p>「很多店的咖啡很強，但太吵。這裡厲害的是它很穩，像把腦中的光標從閃爍調成呼吸燈，讓專注回來得很自然。」</p>
+            </article>
+            <article class="section-card testimonial-card" data-reveal>
+              <div class="testimonial-meta">
+                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80" alt="以珊頭像" loading="lazy" decoding="async" />
+                <div>
+                  <div class="testimonial-name">以珊</div>
+                  <div class="testimonial-role">夜班護理師</div>
+                </div>
+              </div>
+              <p>「我喜歡它不是把你往上推，而是先把你接住。夜班結束後喝一杯，會有種『今天的自己有被好好善待』的感覺。」</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-shell pt-0" id="reserve">
+        <div class="container-shell px-4 sm:px-6">
+          <div class="grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+            <div class="lg:col-span-7 section-head">
+              <div class="eyebrow mb-4">04 / Final Call</div>
+              <h2 class="section-title text-[clamp(2.4rem,5vw,4.6rem)] mb-4" data-reveal>
+                今晚，把情緒交給香氣，
+                <br class="hidden sm:block" />把清醒留給真正重要的事。
+              </h2>
+              <p class="section-desc text-base sm:text-lg max-w-2xl" data-reveal>
+                預約你的夜間座位，或直接帶走十杯完治處方。無論你是準備再衝一輪、剛剛結束一場硬仗，還是只是想安靜地被一杯好咖啡理解，這裡都留著一個位置。
+              </p>
+            </div>
+            <div class="lg:col-span-5 section-card p-5 sm:p-6 lg:p-7" data-reveal>
+              <div class="section-number">04</div>
+              <div class="space-y-5 relative z-10">
+                <div class="small-kicker">
+                  <span class="inline-flex items-center gap-2"><span class="highlight-dot"></span> Reserve Now</span>
+                  <span>台北・深夜預約制</span>
+                </div>
+                <div class="offer-grid">
+                  <article class="section-card offer-card p-4 sm:p-5">
+                    <iconify-icon icon="lucide:alarm-clock"></iconify-icon>
+                    <h3 class="mt-4 mb-2">營業時段</h3>
+                    <p>每日 18:00 — 02:00，讓下班後的你仍然有一處光線柔和、香氣準確的落點。</p>
+                  </article>
+                  <article class="section-card offer-card p-4 sm:p-5">
+                    <iconify-icon icon="lucide:package"></iconify-icon>
+                    <h3 class="mt-4 mb-2">外帶套組</h3>
+                    <p>十杯處方可做成冷熱混搭訂閱盒，適合工作室、夜班團隊與長時段創作現場。</p>
+                  </article>
+                  <article class="section-card offer-card p-4 sm:p-5">
+                    <iconify-icon icon="lucide:headphones"></iconify-icon>
+                    <h3 class="mt-4 mb-2">氛圍體驗</h3>
+                    <p>現場以低頻播放清醒系 ambient playlist，讓專注感像奶泡一樣慢慢浮上來。</p>
+                  </article>
+                </div>
+                <div class="cta-row pt-2">
+                  <a href="#hero" class="magnetic primary text-sm sm:text-base">
+                    <iconify-icon icon="lucide:calendar-days"></iconify-icon>
+                    立即預約夜間座位
+                  </a>
+                  <a href="#menu" class="magnetic secondary text-sm sm:text-base">
+                    <iconify-icon icon="lucide:coffee"></iconify-icon>
+                    直接挑選今晚那一杯
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <footer class="pt-14 pb-10 sm:pb-12">
+            <div class="footer-line mb-6"></div>
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-sm text-white/52">
+              <div>
+                <div class="tracking-[0.32em] uppercase text-[0.72rem] mb-2">完治加啡 / Cure by Cup</div>
+                <div>給夜班靈魂的一間精品咖啡館。十杯處方，為不同的情緒修復而生。</div>
+              </div>
+              <div class="flex flex-wrap items-center gap-4 text-white/58">
+                <span class="inline-flex items-center gap-2"><iconify-icon icon="lucide:map-pin"></iconify-icon> 台北深夜預約制</span>
+                <span class="inline-flex items-center gap-2"><iconify-icon icon="lucide:clock-3"></iconify-icon> 18:00–02:00</span>
+                <span class="inline-flex items-center gap-2"><iconify-icon icon="lucide:smartphone"></iconify-icon> curebycup@nightmail.tw</span>
+              </div>
+            </div>
+          </footer>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const menuItems = [
+      {
+        name: '黑曜診斷美式',
+        price: 'NT$ 150',
+        image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1400&q=80',
+        tags: ['black', 'steady', 'clean finish'],
+        story: '第一口像把城市的雜音瞬間按了靜音鍵。它用俐落的黑巧克力尾韻和乾淨回甘，陪你把心情從過載狀態拉回可控範圍，適合所有需要重新整理呼吸的人。'
+      },
+      {
+        name: '晨霧白拿鐵',
+        price: 'NT$ 190',
+        image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80',
+        tags: ['milk', 'soft glow', 'comfort'],
+        story: '像天還沒亮時窗外那層淡淡的霧，奶香包住中焙豆的堅果甜感，特別適合剛結束一場耗神會議的夜晚，讓人慢慢卸下防備。'
+      },
+      {
+        name: '鹽花太妃馥列白',
+        price: 'NT$ 210',
+        image: 'https://images.unsplash.com/photo-1497636577773-f1231844b336?auto=format&fit=crop&w=1200&q=80',
+        tags: ['toffee', 'sea salt', 'flat white'],
+        story: '甜不是撒嬌，而是把今天的尖銳磨圓一點。太妃糖的厚度被一撮鹽花提亮，喝起來像有人把你緊握了一天的拳頭輕輕打開。'
+      },
+      {
+        name: '桂花蜜橘冷萃',
+        price: 'NT$ 220',
+        image: 'https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=1200&q=80',
+        tags: ['cold brew', 'osmanthus', 'citrus'],
+        story: '像深夜收到一句簡短卻剛好的「你辛苦了」。桂花香把冷萃的清冽拉得更長，尾端再留一抹橘皮，讓整個人都亮一點，但不刺眼。'
+      },
+      {
+        name: '黑糖雲頂馥芮白',
+        price: 'NT$ 210',
+        image: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=1200&q=80',
+        tags: ['brown sugar', 'velvet', 'float'],
+        story: '雲一樣的奶泡覆上黑糖焦香，入口先溫柔、後段再慢慢提神。它很像晚上十點後仍然想要一點安全感的人，明明疲倦，卻還想把今晚過得漂亮。'
+      },
+      {
+        name: '可可橙皮摩卡',
+        price: 'NT$ 230',
+        image: 'https://images.unsplash.com/photo-1459755486867-b55449bb39ff?auto=format&fit=crop&w=1200&q=80',
+        tags: ['mocha', 'orange peel', 'deep'],
+        story: '苦與甜不再對立，像你終於能接受今天也有遺憾。黑可可的厚度被橙皮香氣輕輕切開，留下的是成熟、安靜，而且很有餘韻的夜色。'
+      },
+      {
+        name: '焙茶奶油西西里',
+        price: 'NT$ 220',
+        image: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=1200&q=80',
+        tags: ['hojicha', 'citrus', 'cream'],
+        story: '把咖啡的醒腦感和焙茶的安定感放進同一個杯口，意外地很適合混亂的一天。檸檬在前、焙茶在後，像一場短暫陣雨後慢慢轉乾的街。'
+      },
+      {
+        name: '荔枝玫瑰氣泡咖啡',
+        price: 'NT$ 240',
+        image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=1200&q=80',
+        tags: ['sparkling', 'rose', 'lychee'],
+        story: '專為情緒低潮卻還想保留一點浪漫的人而做。氣泡把荔枝與玫瑰的香氣撐得很輕，像心情慢慢浮起來，不用勉強，也能重新相信今晚。'
+      },
+      {
+        name: '微醺提拉米蘇冰滴',
+        price: 'NT$ 250',
+        image: 'https://images.unsplash.com/photo-1461988625982-7e46a099bf4f?auto=format&fit=crop&w=1200&q=80',
+        tags: ['drip', 'dessert', 'nightcap'],
+        story: '像把晚餐後的成熟與午夜的失眠一起層層浸泡。它帶著提拉米蘇式的可可與奶香記憶，沒有真的醉，卻能把夜晚變得更鬆、更柔軟。'
+      },
+      {
+        name: '深夜療程手沖',
+        price: 'NT$ 280',
+        image: 'https://images.unsplash.com/photo-1464306076886-da185f6a9d05?auto=format&fit=crop&w=1200&q=80',
+        tags: ['hand drip', 'limited', 'ritual'],
+        story: '每天只留少量名額，像是給真正需要被安靜對待的人預留的位置。依照當日豆單手工沖煮，香氣展開得很慢，像你終於把整天的重量一寸寸放下。'
+      }
+    ];
+
+    function renderMenu() {
+      const grid = document.getElementById('menu-grid');
+      if (!grid) return;
+
+      grid.innerHTML = menuItems.map((item, index) => {
+        const cardBase = `section-card tilt-card p-4 sm:p-5 lg:p-6 ${index === 0 ? 'featured-card' : ''}`;
+        const imageClass = index === 0 ? 'menu-image aspect-[4/3] lg:aspect-auto' : 'menu-image aspect-[4/5]';
+        const bodyClass = index === 0 ? 'menu-inner' : 'space-y-5';
+        const content = `
+          <div class="${bodyClass}">
+            <div class="${imageClass}">
+              <img src="${item.image}" alt="${item.name}" loading="lazy" decoding="async" />
+            </div>
+            <div class="flex flex-col justify-between gap-5">
+              <div>
+                <div class="flex items-start justify-between gap-4 mb-4">
+                  <div>
+                    <div class="text-[0.72rem] tracking-[0.34em] uppercase text-white/40 mb-2">${String(index + 1).padStart(2, '0')} / Cure Menu</div>
+                    <h3 class="font-semibold text-[1.35rem] sm:text-[1.55rem] text-white/95 leading-tight tracking-[-0.02em]">${item.name}</h3>
+                  </div>
+                  <div class="menu-price">${item.price}</div>
+                </div>
+                <p class="text-white/72 leading-7 text-sm sm:text-[0.98rem]">${item.story}</p>
+              </div>
+              <div class="menu-tags">${item.tags.map(tag => `<span>${tag}</span>`).join('')}</div>
+            </div>
+          </div>`;
+        return `<article class="${cardBase}" data-reveal>${content}</article>`;
+      }).join('');
+    }
+
+    function initCursor() {
+      const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+      if (isTouch) {
+        document.body.classList.add('is-touch');
+        return;
+      }
+
+      const dot = document.querySelector('.cursor-dot');
+      const ring = document.querySelector('.cursor-ring');
+      if (!dot || !ring) return;
+
+      let mouseX = window.innerWidth / 2;
+      let mouseY = window.innerHeight / 2;
+      let ringX = mouseX;
+      let ringY = mouseY;
+
+      const setDot = (x, y) => {
+        dot.style.left = `${x}px`;
+        dot.style.top = `${y}px`;
+      };
+
+      const setRing = (x, y) => {
+        ring.style.left = `${x}px`;
+        ring.style.top = `${y}px`;
+      };
+
+      window.addEventListener('mousemove', (event) => {
+        mouseX = event.clientX;
+        mouseY = event.clientY;
+        setDot(mouseX, mouseY);
+        document.body.classList.add('cursor-visible');
+      });
+
+      window.addEventListener('mouseleave', () => {
+        document.body.classList.remove('cursor-visible');
+      });
+
+      const animateRing = () => {
+        ringX += (mouseX - ringX) * 0.16;
+        ringY += (mouseY - ringY) * 0.16;
+        setRing(ringX, ringY);
+        requestAnimationFrame(animateRing);
+      };
+      animateRing();
+
+      document.querySelectorAll('a, button, .tilt-card, .partner-card').forEach((el) => {
+        el.addEventListener('mouseenter', () => document.body.classList.add('cursor-active'));
+        el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-active'));
+      });
+    }
+
+    function initMagnetic() {
+      if (window.matchMedia('(hover: none), (pointer: coarse)').matches) return;
+      document.querySelectorAll('.magnetic').forEach((button) => {
+        button.addEventListener('mousemove', (event) => {
+          const rect = button.getBoundingClientRect();
+          const offsetX = event.clientX - rect.left - rect.width / 2;
+          const offsetY = event.clientY - rect.top - rect.height / 2;
+          gsap.to(button, {
+            x: offsetX * 0.16,
+            y: offsetY * 0.2,
+            duration: 0.35,
+            ease: 'power2.out'
+          });
+        });
+        button.addEventListener('mouseleave', () => {
+          gsap.to(button, {
+            x: 0,
+            y: 0,
+            duration: 0.8,
+            ease: 'elastic.out(1, 0.3)'
+          });
+        });
+      });
+    }
+
+    function initTilt() {
+      if (window.matchMedia('(hover: none), (pointer: coarse)').matches) return;
+      document.querySelectorAll('.tilt-card').forEach((card) => {
+        card.addEventListener('mousemove', (event) => {
+          const rect = card.getBoundingClientRect();
+          const px = ((event.clientX - rect.left) / rect.width) * 100;
+          const py = ((event.clientY - rect.top) / rect.height) * 100;
+          const rotateY = ((event.clientX - rect.left) / rect.width - 0.5) * 10;
+          const rotateX = -((event.clientY - rect.top) / rect.height - 0.5) * 9;
+          card.style.setProperty('--px', `${px}%`);
+          card.style.setProperty('--py', `${py}%`);
+          gsap.to(card, {
+            rotateX,
+            rotateY,
+            duration: 0.45,
+            ease: 'power2.out',
+            transformPerspective: 1200
+          });
+        });
+        card.addEventListener('mouseleave', () => {
+          gsap.to(card, {
+            rotateX: 0,
+            rotateY: 0,
+            duration: 0.8,
+            ease: 'power3.out'
+          });
+        });
+      });
+    }
+
+    function initParallax() {
+      const hero = document.getElementById('hero');
+      if (!hero || window.matchMedia('(hover: none), (pointer: coarse)').matches) return;
+      const layers = hero.querySelectorAll('[data-depth]');
+
+      hero.addEventListener('mousemove', (event) => {
+        const rect = hero.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / rect.width - 0.5;
+        const y = (event.clientY - rect.top) / rect.height - 0.5;
+        layers.forEach((layer) => {
+          const depth = Number(layer.dataset.depth || 1);
+          gsap.to(layer, {
+            x: x * depth * 26,
+            y: y * depth * 18,
+            duration: 0.9,
+            ease: 'power3.out'
+          });
+        });
+      });
+
+      hero.addEventListener('mouseleave', () => {
+        layers.forEach((layer) => {
+          gsap.to(layer, { x: 0, y: 0, duration: 1.2, ease: 'power3.out' });
+        });
+      });
+    }
+
+    function initIntro(reducedMotion) {
+      const slices = gsap.utils.toArray('.slice');
+      if (reducedMotion || !slices.length) {
+        gsap.set('.slice-overlay', { autoAlpha: 0 });
+        gsap.set('.hero-panel, [data-reveal]', { opacity: 1, y: 0 });
+        return;
+      }
+
+      const timeline = gsap.timeline({ defaults: { ease: 'power4.out' } });
+      timeline
+        .to(slices, {
+          yPercent: 0,
+          duration: 0.95,
+          stagger: 0.08
+        }, 0)
+        .from('.hero-kicker', { y: 18, opacity: 0, duration: 0.8 }, 0.45)
+        .from('.hero-title .line span', { yPercent: 110, stagger: 0.08, duration: 1 }, 0.55)
+        .from('.hero-copy', { y: 26, opacity: 0, duration: 0.9 }, 0.8)
+        .from('.cta-row', { y: 26, opacity: 0, duration: 0.8 }, 0.95)
+        .from('.meta-grid', { y: 26, opacity: 0, duration: 0.85 }, 1.02)
+        .from('.floating-card', { y: 50, opacity: 0, rotateX: -12, duration: 1.15 }, 0.95)
+        .to(slices, {
+          yPercent: 110,
+          duration: 1.1,
+          stagger: { each: 0.08, from: 'end' },
+          ease: 'power4.inOut'
+        }, 1.1)
+        .to('.slice-overlay', { autoAlpha: 0, duration: 0.2 }, 2.1);
+
+      gsap.to('.hero-scroll', {
+        y: 12,
+        repeat: -1,
+        yoyo: true,
+        duration: 1.35,
+        ease: 'sine.inOut'
+      });
+    }
+
+    function initScrollReveal(reducedMotion) {
+      if (reducedMotion) {
+        gsap.set('[data-reveal]', { opacity: 1, y: 0 });
+        return;
+      }
+
+      gsap.utils.toArray('[data-reveal]').forEach((element) => {
+        gsap.to(element, {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: element,
+            start: 'top 84%'
+          }
+        });
+      });
+
+      gsap.utils.toArray('.partner-card').forEach((card, index) => {
+        gsap.from(card, {
+          y: 18,
+          opacity: 0,
+          duration: 0.7,
+          delay: index * 0.05,
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 88%'
+          }
+        });
+      });
+    }
+
+    function buildWavePath(width, height, phase = 0, invert = false) {
+      const segments = 10;
+      const base = invert ? height * 0.35 : height * 0.68;
+      const amp = height * 0.13;
+      const points = [];
+
+      for (let i = 0; i <= segments; i++) {
+        const x = width * (i / segments);
+        const y = base + Math.sin(phase + i * 0.72) * amp + Math.cos(phase * 1.15 + i * 0.34) * amp * 0.35;
+        points.push({ x, y });
+      }
+
+      let d = invert ? `M 0 0 L 0 ${points[0].y}` : `M 0 ${height} L 0 ${points[0].y}`;
+      for (let i = 1; i < points.length; i++) {
+        const prev = points[i - 1];
+        const curr = points[i];
+        const cx = (prev.x + curr.x) / 2;
+        const cy = (prev.y + curr.y) / 2;
+        d += ` Q ${prev.x} ${prev.y} ${cx} ${cy}`;
+      }
+      const last = points[points.length - 1];
+      d += ` T ${last.x} ${last.y}`;
+      d += invert ? ` L ${width} 0 Z` : ` L ${width} ${height} Z`;
+      return d;
+    }
+
+    function initLiquids(reducedMotion) {
+      const paths = document.querySelectorAll('.liquid-path');
+      if (!paths.length) return;
+
+      if (reducedMotion) {
+        paths.forEach((path, index) => {
+          const svg = path.ownerSVGElement;
+          const width = svg.viewBox.baseVal.width || 1440;
+          const height = svg.viewBox.baseVal.height || 220;
+          path.setAttribute('d', buildWavePath(width, height, 1 + index * 0.35, index % 2 === 1));
+        });
+        return;
+      }
+
+      const animate = (time) => {
+        const phase = time * 0.00055;
+        paths.forEach((path, index) => {
+          const svg = path.ownerSVGElement;
+          const width = svg.viewBox.baseVal.width || 1440;
+          const height = svg.viewBox.baseVal.height || 220;
+          path.setAttribute('d', buildWavePath(width, height, phase + index * 0.85, index % 2 === 1));
+        });
+        requestAnimationFrame(animate);
+      };
+      requestAnimationFrame(animate);
+    }
+
+    function initWebGL(reducedMotion) {
+      const holder = document.getElementById('webgl-wrap');
+      if (!holder || typeof THREE === 'undefined') return;
+
+      try {
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, window.innerWidth < 768 ? 1.2 : 1.7));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        holder.appendChild(renderer.domElement);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+        const uniforms = {
+          uTime: { value: 0 },
+          uMouse: { value: new THREE.Vector2(0.62, 0.54) },
+          uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
+        };
+
+        const material = new THREE.ShaderMaterial({
+          uniforms,
+          vertexShader: `
+            varying vec2 vUv;
+            void main() {
+              vUv = uv;
+              gl_Position = vec4(position, 1.0);
+            }
+          `,
+          fragmentShader: `
+            precision highp float;
+            varying vec2 vUv;
+            uniform float uTime;
+            uniform vec2 uMouse;
+            uniform vec2 uResolution;
+
+            float hash(vec2 p) {
+              return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+            }
+
+            float noise(vec2 p) {
+              vec2 i = floor(p);
+              vec2 f = fract(p);
+              vec2 u = f * f * (3.0 - 2.0 * f);
+              return mix(
+                mix(hash(i + vec2(0.0, 0.0)), hash(i + vec2(1.0, 0.0)), u.x),
+                mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
+                u.y
+              );
+            }
+
+            float fbm(vec2 p) {
+              float value = 0.0;
+              float amp = 0.5;
+              for (int i = 0; i < 5; i++) {
+                value += amp * noise(p);
+                p = p * 2.0 + vec2(17.1, 9.2);
+                amp *= 0.52;
+              }
+              return value;
+            }
+
+            void main() {
+              vec2 uv = vUv;
+              vec2 p = (uv - 0.5) * vec2(uResolution.x / uResolution.y, 1.0);
+              vec2 m = (uMouse - 0.5) * vec2(uResolution.x / uResolution.y, 1.0);
+              float dist = length(p - m);
+              float ripple = sin(10.0 * dist - uTime * 1.55) * exp(-2.8 * dist);
+              vec2 q = p;
+              q += 0.14 * vec2(fbm(p * 1.3 + uTime * 0.05), fbm(p * 1.25 - uTime * 0.04));
+              q += ripple * 0.03;
+              float n1 = fbm(q * 2.4 + uTime * 0.02);
+              float n2 = fbm(q * 3.2 - uTime * 0.03 + 2.7);
+              float glow = smoothstep(0.85, 0.15, dist);
+
+              vec3 c1 = vec3(0.02, 0.03, 0.045);
+              vec3 c2 = vec3(0.08, 0.15, 0.16);
+              vec3 c3 = vec3(0.75, 0.57, 0.31);
+              vec3 c4 = vec3(0.96, 0.92, 0.84);
+
+              vec3 col = mix(c1, c2, smoothstep(0.08, 0.95, n1));
+              col = mix(col, c3, smoothstep(0.58, 0.96, n2) * 0.42);
+              col += c4 * pow(glow, 4.2) * 0.08;
+
+              float vignette = smoothstep(1.55, 0.18, length(p));
+              col *= vignette;
+              gl_FragColor = vec4(col, 1.0);
+            }
+          `
+        });
+
+        const plane = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
+        scene.add(plane);
+
+        const clock = new THREE.Clock();
+
+        const handlePointer = (event) => {
+          const x = event.clientX / window.innerWidth;
+          const y = 1 - event.clientY / window.innerHeight;
+          gsap.to(uniforms.uMouse.value, {
+            x,
+            y,
+            duration: reducedMotion ? 0 : 0.8,
+            ease: 'power2.out',
+            overwrite: true
+          });
+        };
+
+        window.addEventListener('pointermove', handlePointer, { passive: true });
+
+        const resize = () => {
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio, window.innerWidth < 768 ? 1.2 : 1.7));
+          renderer.setSize(window.innerWidth, window.innerHeight);
+          uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+        };
+        window.addEventListener('resize', resize);
+
+        const render = () => {
+          uniforms.uTime.value = reducedMotion ? clock.getElapsedTime() * 0.22 : clock.getElapsedTime() * 0.75;
+          renderer.render(scene, camera);
+          requestAnimationFrame(render);
+        };
+        render();
+      } catch (error) {
+        console.warn('WebGL background failed to initialize.', error);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderMenu();
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      gsap.registerPlugin(ScrollTrigger);
+      initCursor();
+      initMagnetic();
+      initTilt();
+      initParallax();
+      initIntro(reducedMotion);
+      initScrollReveal(reducedMotion);
+      initLiquids(reducedMotion);
+      initWebGL(reducedMotion);
+    });
+  </script>
+</body>
+</html>
