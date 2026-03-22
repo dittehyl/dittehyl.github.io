@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>防守的哲學 | TACTICAL MINDSET</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    
+    <style>
+        :root {
+            --bg: #0a0f1c;
+            --fg: #f0f4f8;
+            --muted: #5a6678;
+            --accent: #00ff88;
+            --accent-dim: #00cc6a;
+            --card: rgba(16, 24, 40, 0.85);
+            --border: rgba(255, 255, 255, 0.08);
+            --glow: rgba(0, 255, 136, 0.15);
+            --sidebar-width: 80px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            overflow-x: hidden;
+            cursor: none;
+            padding-right: var(--sidebar-width);
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding-right: 0;
+                --sidebar-width: 60px;
+            }
+        }
+        
+        .font-display {
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 0.05em;
+        }
+        
+        /* Noise Texture Overlay */
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.035;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+        
+        /* Custom Cursor */
+        .cursor-dot {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10001;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease, width 0.3s ease, height 0.3s ease;
+        }
+        
+        .cursor-ring {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+            transition: transform 0.15s ease-out, width 0.3s ease, height 0.3s ease, border-color 0.3s ease;
+            mix-blend-mode: difference;
+        }
+        
+        .cursor-hover .cursor-ring {
+            width: 60px;
+            height: 60px;
+            border-color: var(--fg);
+        }
+        
+        /* WebGL Canvas */
+        #webgl-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        /* Four Column Slices */
+        .slice-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .slice-column {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .slice-column::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, var(--accent), transparent);
+            opacity: 0.3;
+        }
+        
+        .slice-column:last-child::after {
+            display: none;
+        }
+        
+        .slice-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            filter: brightness(0.3) contrast(1.1);
+            transform: scaleY(1.2);
+        }
+        
+        /* Grid Lines */
+        .grid-lines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.06;
+        }
+        
+        .grid-line {
+            position: absolute;
+            background: var(--accent);
+        }
+        
+        .grid-line-v {
+            width: 1px;
+            height: 100%;
+        }
+        
+        .grid-line-h {
+            width: 100%;
+            height: 1px;
+        }
+        
+        /* Content Sections */
+        .section {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 6rem 2rem;
+        }
+        
+        @media (min-width: 768px) {
+            .section {
+                padding: 8rem 4rem;
+            }
+        }
+        
+        /* Stagger Animation */
+        .reveal-item {
+            opacity: 0;
+            transform: translateY(60px);
+        }
+        
+        /* Magnetic Button */
+        .magnetic-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2.5rem;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.125rem;
+            letter-spacing: 0.15em;
+            cursor: none;
+            overflow: hidden;
+            transition: color 0.4s ease, border-color 0.4s ease;
+        }
+        
+        .magnetic-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--accent);
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .magnetic-btn:hover::before {
+            transform: translateY(0);
+        }
+        
+        .magnetic-btn:hover {
+            color: var(--bg);
+            border-color: var(--accent);
+        }
+        
+        .magnetic-btn span {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Principle Cards */
+        .principle-card {
+            position: relative;
+            background: var(--card);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            padding: 2.5rem;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
+        }
+        
+        .principle-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent);
+        }
+        
+        .principle-number {
+            position: absolute;
+            top: -1.5rem;
+            left: 2rem;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 5rem;
+            line-height: 1;
+            color: transparent;
+            -webkit-text-stroke: 1px var(--accent);
+            opacity: 0.6;
+        }
+        
+        /* Stats Counter */
+        .stat-number {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            line-height: 1;
+            color: var(--accent);
+        }
+        
+        /* Glowing Text */
+        .text-glow {
+            text-shadow: 0 0 40px var(--glow);
+        }
+        
+        /* Divider */
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--border), transparent);
+        }
+        
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+        
+        .scroll-indicator.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .scroll-line {
+            width: 1px;
+            height: 60px;
+            background: linear-gradient(to bottom, var(--accent), transparent);
+            animation: scrollPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes scrollPulse {
+            0%, 100% { transform: scaleY(1); opacity: 1; }
+            50% { transform: scaleY(0.6); opacity: 0.5; }
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: rgba(10, 15, 28, 0.95);
+            border-left: 1px solid var(--border);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .sidebar-content {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .sidebar-text {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.25rem;
+            letter-spacing: 0.2em;
+            color: var(--accent);
+            white-space: nowrap;
+        }
+        
+        .sidebar-icon {
+            width: 32px;
+            height: 32px;
+            color: var(--accent);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(0.95); }
+        }
+        
+        .sidebar-link {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+        
+        .sidebar-link:hover {
+            background: rgba(0, 255, 136, 0.05);
+        }
+        
+        .sidebar-link:hover .sidebar-text {
+            color: var(--fg);
+        }
+        
+        .sidebar-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            .cursor-dot, .cursor-ring {
+                display: none;
+            }
+            
+            body {
+                cursor: auto;
+            }
+        }
+        
+        /* Focus States */
+        a:focus-visible, button:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 4px;
+        }
+        
+        /* Mobile Sidebar */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: 60px;
+                top: auto;
+                bottom: 0;
+                border-left: none;
+                border-top: 1px solid var(--border);
+                flex-direction: row;
+                justify-content: center;
+            }
+            
+            .sidebar-content {
+                writing-mode: horizontal-tb;
+                flex-direction: row;
+                gap: 0.75rem;
+            }
+            
+            .sidebar-text {
+                font-size: 1rem;
+            }
+            
+            .sidebar-icon {
+                width: 24px;
+                height: 24px;
+            }
+            
+            .sidebar-badge {
+                top: 0.5rem;
+                right: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Noise Overlay -->
+    <div class="noise-overlay"></div>
+    
+    <!-- Custom Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="https://forms.gle/hNSmUa1VDqmQy1FF9" target="_blank" rel="noopener noreferrer" class="sidebar-link" aria-label="美崙國中體育班招生中">
+            <span class="sidebar-badge"></span>
+            <div class="sidebar-content">
+                <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 6v6l4 2"></path>
+                </svg>
+                <span class="sidebar-text">美崙國中體育班招生中</span>
+                <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform: rotate(-90deg);">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </div>
+        </a>
+    </aside>
+    
+    <!-- WebGL Background -->
+    <canvas id="webgl-canvas"></canvas>
+    
+    <!-- Grid Lines -->
+    <div class="grid-lines" id="grid-lines"></div>
+    
+    <!-- Slice Container -->
+    <div class="slice-container" id="slice-container">
+        <div class="slice-column"><img class="slice-image" src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80" alt="" aria-hidden="true"></div>
+        <div class="slice-column"><img class="slice-image" src="https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=800&q=80" alt="" aria-hidden="true"></div>
+        <div class="slice-column"><img class="slice-image" src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800&q=80" alt="" aria-hidden="true"></div>
+        <div class="slice-column"><img class="slice-image" src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&q=80" alt="" aria-hidden="true"></div>
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 w-full z-50 px-6 py-4 md:px-12 md:py-6" style="right: var(--sidebar-width);">
+        <div class="flex items-center justify-between">
+            <div class="font-display text-xl tracking-widest text-[var(--accent)]">TACTICAL MINDSET</div>
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#philosophy" class="text-sm text-[var(--muted)] hover:text-[var(--fg)] transition-colors cursor-pointer">哲學</a>
+                <a href="#principles" class="text-sm text-[var(--muted)] hover:text-[var(--fg)] transition-colors cursor-pointer">原則</a>
+                <a href="#proof" class="text-sm text-[var(--muted)] hover:text-[var(--fg)] transition-colors cursor-pointer">數據</a>
+                <a href="#action" class="text-sm text-[var(--muted)] hover:text-[var(--fg)] transition-colors cursor-pointer">行動</a>
+            </div>
+            <button class="magnetic-btn text-xs" aria-label="開始學習">
+                <span>START NOW</span>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="section" id="hero">
+        <div class="max-w-6xl mx-auto w-full">
+            <div class="grid grid-cols-12 gap-4 md:gap-8 items-end">
+                <div class="col-span-12 md:col-span-8">
+                    <p class="reveal-item text-[var(--accent)] font-display text-sm tracking-[0.3em] mb-4">THE PHILOSOPHY OF DEFENSE</p>
+                    <h1 class="reveal-item font-display text-6xl md:text-8xl lg:text-9xl leading-none mb-6 text-glow">
+                        防守的<br/>哲學
+                    </h1>
+                </div>
+                <div class="col-span-12 md:col-span-4">
+                    <p class="reveal-item text-[var(--muted)] text-lg md:text-xl font-light leading-relaxed">
+                        如何在混亂中建立秩序。<br/>
+                        <span class="text-[var(--fg)]">防守不是被動的反應，<br/>而是主動的空間與時間控制。</span>
+                    </p>
+                </div>
+            </div>
+            
+            <div class="mt-16 md:mt-24 flex flex-col md:flex-row items-start md:items-end justify-between gap-8">
+                <div class="reveal-item flex items-center gap-4">
+                    <div class="w-16 h-px bg-[var(--accent)]"></div>
+                    <span class="text-[var(--muted)] text-sm">SCROLL TO EXPLORE</span>
+                </div>
+                <div class="reveal-item flex items-center gap-6">
+                    <div class="text-right">
+                        <p class="text-[var(--muted)] text-xs tracking-widest mb-1">FOR</p>
+                        <p class="text-[var(--fg)] text-sm">足球教練 / 運動員 / 策略家</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Hook Section -->
+    <section class="section relative" id="hook">
+        <div class="max-w-6xl mx-auto w-full">
+            <div class="grid grid-cols-12 gap-8 items-center">
+                <div class="col-span-12 md:col-span-5 order-2 md:order-1">
+                    <div class="reveal-item relative">
+                        <p class="text-[var(--accent)] font-display text-sm tracking-[0.3em] mb-6">2010, CAMP NOU</p>
+                        <h2 class="font-display text-4xl md:text-5xl lg:text-6xl leading-tight mb-6">
+                            10人應戰<br/>
+                            <span class="text-[var(--muted)]">vs</span><br/>
+                            夢幻巴塞
+                        </h2>
+                        <p class="text-[var(--fg)] text-lg leading-relaxed mb-8">
+                            穆里尼奧的球隊沒有創造奇蹟，他們只是執行了一種極致的秩序。
+                        </p>
+                        <div class="flex gap-8">
+                            <div>
+                                <p class="stat-number">0</p>
+                                <p class="text-[var(--muted)] text-sm">失球</p>
+                            </div>
+                            <div>
+                                <p class="stat-number">+15%</p>
+                                <p class="text-[var(--muted)] text-sm">跑動距離</p>
+                            </div>
+                            <div>
+                                <p class="stat-number">-40%</p>
+                                <p class="text-[var(--muted)] text-sm">觸球次數</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-span-12 md:col-span-7 order-1 md:order-2">
+                    <div class="reveal-item relative aspect-video overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=1200&q=80" alt="足球戰術板" class="w-full h-full object-cover" style="filter: brightness(0.7) contrast(1.1);">
+                        <div class="absolute inset-0 bg-gradient-to-t from-[var(--bg)] via-transparent to-transparent"></div>
+                        <div class="absolute bottom-4 left-4 font-display text-6xl text-[var(--accent)] opacity-20">90'</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Myth Section -->
+    <section class="section" id="philosophy">
+        <div class="max-w-6xl mx-auto w-full">
+            <div class="reveal-item text-center mb-16">
+                <p class="text-[var(--accent)] font-display text-sm tracking-[0.3em] mb-4">THE MYTH</p>
+                <h2 class="font-display text-5xl md:text-7xl">迷思破除</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
+                <div class="reveal-item relative p-8 border border-red-500/30 bg-red-500/5">
+                    <div class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-red-500">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </div>
+                    <p class="text-[var(--muted)] text-sm tracking-widest mb-4">MISCONCEPTION</p>
+                    <p class="text-2xl md:text-3xl font-light text-[var(--fg)]">防守 = 搶截 + 鏟球 + 破壞</p>
+                </div>
+                
+                <div class="reveal-item relative p-8 border border-[var(--accent)]/30 bg-[var(--accent)]/5">
+                    <div class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-[var(--accent)]">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <p class="text-[var(--accent)] text-sm tracking-widest mb-4">TRUTH</p>
+                    <p class="text-2xl md:text-3xl font-light text-[var(--fg)]">防守 = 組織 + 預判 + 限制</p>
+                </div>
+            </div>
+            
+            <div class="reveal-item mt-16 text-center">
+                <p class="text-xl md:text-2xl text-[var(--muted)] max-w-3xl mx-auto leading-relaxed">
+                    鏟球是防守失敗的最後手段。<br/>
+                    <span class="text-[var(--fg)]">真正的頂級防守，是讓對手覺得「無路可走」。</span>
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Core Definition -->
+    <section class="section" id="core">
+        <div class="max-w-6xl mx-auto w-full">
+            <div class="reveal-item text-center mb-16">
+                <p class="text-[var(--accent)] font-display text-sm tracking-[0.3em] mb-4">THE CORE</p>
+                <h2 class="font-display text-5xl md:text-7xl mb-8">核心定義</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-4">
+                <div class="reveal-item relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-gradient-to-br from-[var(--accent)]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="p-8 md:p-12 border border-[var(--border)]">
+                        <p class="font-display text-8xl md:text-9xl text-[var(--accent)] opacity-30">01</p>
+                        <h3 class="font-display text-4xl md:text-5xl mt-4 mb-6">空間</h3>
+                        <p class="text-[var(--muted)] text-lg leading-relaxed">進攻方想要空間來施展。防守方的任務，就是剝奪對手的空間。</p>
+                    </div>
+                </div>
+                
+                <div class="reveal-item relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-gradient-to-br from-[var(--accent)]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="p-8 md:p-12 border border-[var(--border)]">
+                        <p class="font-display text-8xl md:text-9xl text-[var(--accent)] opacity-30">02</p>
+                        <h3 class="font-display text-4xl md:text-5xl mt-4 mb-6">時間</h3>
+                        <p class="text-[var(--muted)] text-lg leading-relaxed">當你把對手的思考時間從 3 秒壓縮到 0.5 秒，失誤就會自然發生。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="reveal-item mt-12 text-center">
+                <p class="text-2xl md:text-3xl font-light text-[var(--fg)]">防守，就是對時空的管理學。</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Principles Section -->
+    <section class="section" id="principles">
+        <div class="max-w-6xl mx-auto w-full">
+            <div class="reveal-item text-center mb-20">
+                <p class="text-[var(--accent)] font-display text-sm tracking-[0.3em] mb-4">THREE PRINCIPLES</p>
+                <h2 class="font-display text-5xl md:text-7xl">三大原則</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Principle 1 -->
+                <div class="reveal-item principle-card">
+                    <span class="principle-number">01</span>
+                    <div class="mt-8">
+                        <h3 class="font-display text-3xl md:text-4xl text-[var(--accent)] mb-2">DELAY</h3>
+                        <p class="text-[var(--fg)] text-xl mb-4">延遲</p>
+                        <p class="text-[var(--muted)] leading-relaxed mb-6">不讓對手直面球門。且戰且退，爭取隊友回防時間。</p>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full border border-[var(--accent)] flex items-center justify-center">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                            </div>
+                            <span class="text-[var(--accent)] font-display text-2xl">3 SEC</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Principle 2 -->
+                <div class="reveal-item principle-card">
+                    <span class="principle-number">02</span>
+                    <div class="mt-8">
+                        <h3 class="font-display text-3xl md:text-4xl text-[var(--accent)] mb-2">DENSITY</h3>
+                        <p class="text-[var(--fg)] text-xl mb-4">密度</p>
+                        <p class="text-[var(--muted)] leading-relaxed mb-6">讓對手陷入「交通堵塞」。頂級球隊防守縱深小於 35 公尺。</p>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full border border-[var(--accent)] flex items-center justify-center">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="3" y1="9" x2="21" y2="9"></line>
+                                    <line x1="3" y1="15" x2="21" y2="15"></line>
+                                </svg>
+                            </div>
+                            <span class="text-[var(--accent)] font-display text-2xl">&lt;35M</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Principle 3 -->
+                <div class="reveal-item principle-card">
+                    <span class="principle-number">03</span>
+                    <div class="mt-8">
+                        <h3 class="font-display text-3xl md:text-4xl text-[var(--accent)] mb-2">BALANCE</h3>
+                        <p class="text-[var(--fg)] text-xl mb-4">平衡</p>
+                        <p class="text-[var(--muted)] leading-relaxed mb-6">保護與輪轉。像一個生命體一樣呼吸。有進必有退。</p>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full border border-[var(--accent)] flex items-center justify-center">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2">
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                    <path d="M12 1v6m0 6v10M1 12h6m6 0h10"></path>
+                                </svg>
+                            </div>
+                            <span class="text-[var(--accent)] font-display text-2xl">RHYTHM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Proof Section -->
+    <section class="section" id="proof">
+        <div class="max-w-6xl mx-auto w-full">
+            <div class="grid grid-cols-12 gap-8 items-center">
+                <div class="col-span-12 md:col-span-5">
+                    <div class="reveal-item">
+                        <p class="text-[var(--accent)] font-display text-sm tracking-[0.3em] mb-4">THE PROOF</p>
+                        <h2 class="font-display text-4xl md:text-5xl lg:text-6xl leading-tight mb-6">
+                            2006<br/>
+                            <span class="text-[var(--muted)]">義大利</span>
+                        </h2>
+                        <p class="text-[var(--fg)] text-xl mb-8">世界盃冠軍。7 場比賽僅失 2 球。</p>
+                        <p class="text-[var(--muted)] leading-relaxed">1 個烏龍，1 個點球。運動戰零失球。</p>
+                    </div>
+                </div>
+                
+                <div class="col-span-12 md:col-span-7">
+                    <div class="reveal-item relative">
+                        <div class="relative p-8 md:p-12 border border-[var(--border)] bg-[var(--card)]">
+                            <p class="text-[var(--muted)] text-sm tracking-widest mb-8">每丟一球所需的對手傳球次數</p>
+                            <div class="space-y-8">
+                                <div>
+                                    <div class="flex justify-between items-end mb-2">
+                                        <span class="text-[var(--fg)]">普通球隊</span>
+                                        <span class="font-display text-3xl text-[var(--muted)]">15</span>
+                                    </div>
+                                    <div class="h-2 bg-[var(--border)] overflow-hidden">
+                                        <div class="h-full bg-[var(--muted)]" style="width: 33%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between items-end mb-2">
+                                        <span class="text-[var(--fg)]">頂級防守球隊</span>
+                                        <span class="font-display text-3xl text-[var(--accent)]">45+</span>
+                                    </div>
+                                    <div class="h-2 bg-[var(--border)] overflow-hidden">
+                                        <div class="h-full bg-[var(--accent)]" style="width: 100%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-[var(--muted)] text-sm mt-8">連續 45 次傳球不犯錯？幾乎不可能。</p>
+                        </div>
+                        <div class="absolute -bottom-4 -right-4 w-24 h-24 border border-[var(--accent)]/30"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Metaphor Section -->
+    <section class="section relative overflow-hidden" id="metaphor">
+        <div class="absolute inset-0">
+            <img src="https://images.unsplash.com/photo-1518604666860-9ed391f76460?w=1600&q=80" alt="" class="w-full h-full object-cover" style="filter: brightness(0.2) contrast(1.2);">
+            <div class="absolute inset-0 bg-gradient-to-t from-[var(--bg)] via-[var(--bg)]/80 to-[var(--bg)]/60"></div>
+        </div>
+        
+        <div class="max-w-6xl mx-auto w-full relative z-10">
+            <div class="reveal-item text-center">
+                <p class="text-[var(--accent)] font-display text-sm tracking-[0.3em] mb-6">THE METAPHOR</p>
+                <h2 class="font-display text-5xl md:text-7xl lg:text-8xl mb-8">防守不是牆</h2>
+                <p class="text-3xl md:text-4xl lg:text-5xl font-light text-[var(--accent)] text-glow mb-12">防守是「彈性網」</p>
+                <p class="text-xl md:text-2xl text-[var(--muted)] max-w-3xl mx-auto leading-relaxed">
+                    當對手衝擊時，我們向後收縮，吸收能量；<br/>
+                    當對手力竭時，我們反彈，將球權奪回。<br/>
+                    <span class="text-[var(--fg)]">彈性，才是韌性。最好的防守，是進攻的起點。</span>
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Life Application -->
+    <section class="section" id="life">
+        <div class="max-w-6xl mx-auto w-full">
+            <div class="reveal-item text-center mb-16">
+                <p class="text-[var(--accent)] font-display text-sm tracking-[0.3em] mb-4">LIFE APPLICATION</p>
+                <h2 class="font-display text-5xl md:text-7xl">人生也需要防守</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="reveal-item text-center p-8 border border-[var(--border)] hover:border-[var(--accent)]/50 transition-colors">
+                    <div class="w-16 h-16 mx-auto mb-6 rounded-full border border-[var(--accent)] flex items-center justify-center">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <h3 class="font-display text-2xl text-[var(--accent)] mb-4">延遲</h3>
+                    <p class="text-[var(--muted)] leading-relaxed">面對危機不衝動<br/>先冷靜，爭取思考時間</p>
+                </div>
+                
+                <div class="reveal-item text-center p-8 border border-[var(--border)] hover:border-[var(--accent)]/50 transition-colors">
+                    <div class="w-16 h-16 mx-auto mb-6 rounded-full border border-[var(--accent)] flex items-center justify-center">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-display text-2xl text-[var(--accent)] mb-4">密度</h3>
+                    <p class="text-[var(--muted)] leading-relaxed">建立核心支持系統<br/>依靠家人朋友，集中資源</p>
+                </div>
+                
+                <div class="reveal-item text-center p-8 border border-[var(--border)] hover:border-[var(--accent)]/50 transition-colors">
+                    <div class="w-16 h-16 mx-auto mb-6 rounded-full border border-[var(--accent)] flex items-center justify-center">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5">
+                            <path d="M18 20V10"></path>
+                            <path d="M12 20V4"></path>
+                            <path d="M6 20v-6"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-display text-2xl text-[var(--accent)] mb-4">平衡</h3>
+                    <p class="text-[var(--muted)] leading-relaxed">工作與生活的輪轉<br/>應對危機時照顧好自己</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="section" id="action">
+        <div class="max-w-4xl mx-auto w-full text-center">
+            <div class="reveal-item">
+                <p class="text-[var(--accent)] font-display text-sm tracking-[0.3em] mb-6">CALL TO ACTION</p>
+                <h2 class="font-display text-5xl md:text-7xl lg:text-8xl leading-tight mb-8">
+                    不要只盯著球<br/>
+                    <span class="text-[var(--accent)]">去建立秩序</span>
+                </h2>
+                <p class="text-xl md:text-2xl text-[var(--muted)] mb-12 max-w-2xl mx-auto leading-relaxed">
+                    無論你是教練、管理者，還是家長。<br/>
+                    今天，請開始建立你的防線。<br/>
+                    <span class="text-[var(--fg)]">因為只有站得穩，才能跑得遠。</span>
+                </p>
+                
+                <button class="magnetic-btn" aria-label="建立你的防線">
+                    <span>建立你的防線</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="relative z-10 border-t border-[var(--border)] py-12 px-6" style="padding-right: calc(1.5rem + var(--sidebar-width));">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+                <div class="font-display text-2xl tracking-widest text-[var(--accent)]">TACTICAL MINDSET</div>
+                <div class="flex items-center gap-6">
+                    <a href="#" class="text-[var(--muted)] hover:text-[var(--fg)] transition-colors" aria-label="Twitter">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+                        </svg>
+                    </a>
+                    <a href="#" class="text-[var(--muted)] hover:text-[var(--fg)] transition-colors" aria-label="Instagram">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                        </svg>
+                    </a>
+                    <a href="#" class="text-[var(--muted)] hover:text-[var(--fg)] transition-colors" aria-label="YouTube">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path>
+                            <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+                        </svg>
+                    </a>
+                </div>
+                <p class="text-[var(--muted)] text-sm">THE PHILOSOPHY OF DEFENSE</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator" id="scroll-indicator">
+        <span class="text-[var(--accent)] text-xs tracking-widest font-display">SCROLL</span>
+        <div class="scroll-line"></div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        
+        // Initialize variables first
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorRing = document.querySelector('.cursor-ring');
+        const sliceColumns = document.querySelectorAll('.slice-column');
+        const scrollIndicator = document.getElementById('scroll-indicator');
+        const gridLinesContainer = document.getElementById('grid-lines');
+        
+        let mouseX = 0;
+        let mouseY = 0;
+        let currentX = 0;
+        let currentY = 0;
+        let scrollY = 0;
+        let lastScrollY = 0;
+        let velocity = 0;
+        
+        // Check reduced motion preference
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        
+        // Custom Cursor
+        if (!prefersReducedMotion && cursorDot && cursorRing) {
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+            
+            document.addEventListener('mousedown', () => {
+                cursorDot.style.transform = `translate(-50%, -50%) scale(0.5)`;
+            });
+            
+            document.addEventListener('mouseup', () => {
+                cursorDot.style.transform = `translate(-50%, -50%) scale(1)`;
+            });
+            
+            // Hover effects
+            const interactiveElements = document.querySelectorAll('a, button, .principle-card');
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+                el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+            });
+            
+            function animateCursor() {
+                currentX += (mouseX - currentX) * 0.15;
+                currentY += (mouseY - currentY) * 0.15;
+                
+                cursorDot.style.left = `${mouseX}px`;
+                cursorDot.style.top = `${mouseY}px`;
+                cursorRing.style.left = `${currentX}px`;
+                cursorRing.style.top = `${currentY}px`;
+                
+                requestAnimationFrame(animateCursor);
+            }
+            animateCursor();
+        }
+        
+        // Grid Lines
+        function createGridLines() {
+            if (!gridLinesContainer) return;
+            
+            const vLines = [10, 25, 40, 55, 70, 85];
+            const hLines = [15, 35, 55, 75, 90];
+            
+            vLines.forEach(pos => {
+                const line = document.createElement('div');
+                line.className = 'grid-line grid-line-v';
+                line.style.left = `${pos}%`;
+                gridLinesContainer.appendChild(line);
+            });
+            
+            hLines.forEach(pos => {
+                const line = document.createElement('div');
+                line.className = 'grid-line grid-line-h';
+                line.style.top = `${pos}%`;
+                gridLinesContainer.appendChild(line);
+            });
+        }
+        createGridLines();
+        
+        // WebGL Background with Noise
+        function initWebGL() {
+            const canvas = document.getElementById('webgl-canvas');
+            if (!canvas) return;
+            
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            
+            // Particles
+            const particlesCount = 1500;
+            const positions = new Float32Array(particlesCount * 3);
+            const colors = new Float32Array(particlesCount * 3);
+            
+            for (let i = 0; i < particlesCount; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 20;
+                positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
+                
+                const intensity = Math.random() * 0.5 + 0.2;
+                colors[i * 3] = 0;
+                colors[i * 3 + 1] = intensity;
+                colors[i * 3 + 2] = intensity * 0.5;
+            }
+            
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            
+            const material = new THREE.PointsMaterial({
+                size: 0.03,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.6,
+                blending: THREE.AdditiveBlending
+            });
+            
+            const particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+            
+            camera.position.z = 5;
+            
+            let time = 0;
+            
+            function animate() {
+                if (prefersReducedMotion) {
+                    renderer.render(scene, camera);
+                    return;
+                }
+                
+                time += 0.001;
+                particles.rotation.y = time * 0.1;
+                particles.rotation.x = Math.sin(time) * 0.1;
+                
+                // Mouse influence
+                const targetX = (mouseX / window.innerWidth - 0.5) * 0.5;
+                const targetY = (mouseY / window.innerHeight - 0.5) * 0.5;
+                particles.rotation.y += (targetX - particles.rotation.y * 0.1) * 0.01;
+                particles.rotation.x += (targetY - particles.rotation.x * 0.1) * 0.01;
+                
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            }
+            animate();
+            
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+        initWebGL();
+        
+        // Slice Animation
+        function animateSlices() {
+            if (prefersReducedMotion || !sliceColumns.length) return;
+            
+            scrollY = window.scrollY;
+            velocity = (scrollY - lastScrollY) * 0.1;
+            lastScrollY = scrollY;
+            
+            const maxScroll = document.body.scrollHeight - window.innerHeight;
+            const scrollProgress = scrollY / maxScroll;
+            
+            sliceColumns.forEach((col, index) => {
+                const offset = index % 2 === 0 ? velocity * 2 : -velocity * 2;
+                const baseOffset = scrollProgress * -100;
+                col.style.transform = `translateY(${baseOffset + offset + (index * 5)}px)`;
+            });
+            
+            requestAnimationFrame(animateSlices);
+        }
+        animateSlices();
+        
+        // Scroll Animations
+        function initScrollAnimations() {
+            const revealItems = document.querySelectorAll('.reveal-item');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'translateY(0)';
+                        }, index * 100);
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            revealItems.forEach(item => {
+                item.style.transition = 'opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+                observer.observe(item);
+            });
+        }
+        initScrollAnimations();
+        
+        // Hide scroll indicator
+        if (scrollIndicator) {
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 100) {
+                    scrollIndicator.classList.add('hidden');
+                } else {
+                    scrollIndicator.classList.remove('hidden');
+                }
+            });
+        }
+        
+        // Magnetic Buttons
+        function initMagneticButtons() {
+            if (prefersReducedMotion) return;
+            
+            const buttons = document.querySelectorAll('.magnetic-btn');
+            
+            buttons.forEach(btn => {
+                btn.addEventListener('mousemove', (e) => {
+                    const rect = btn.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    
+                    btn.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
+                });
+                
+                btn.addEventListener('mouseleave', () => {
+                    btn.style.transform = 'translate(0, 0)';
+                });
+            });
+        }
+        initMagneticButtons();
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
